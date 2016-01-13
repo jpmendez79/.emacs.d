@@ -158,3 +158,17 @@ Manage programming projects in Emacs
   
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 #+END_SRC
+
+
+
+
+
+
+
+
+
+
+
+
+
+
