@@ -25,6 +25,7 @@ Sets up Latitude and Longitude for Weather Reports and Sunrise/Sunset Settings
 *** Personal Lisp Directories and Other Load Paths
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/local-lisp")
+(add-to-list 'load-path "~/.emacs.d/local-lisp/git-emacs-master")
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 (setq use-package-verbose t)
@@ -101,6 +102,14 @@ Set up Spell Checking
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-ca" 'org-agenda)
 #+END_SRC
+*** Keywords
+#+BEGIN_SRC emacs-lisp
+(setq org-todo-keywords
+      '((sequence "NEXT(n!)" "|" "DONE(d!)")
+        (sequence "WAITING(w@/!)" "APPT(a!)" )
+        (sequence "|" "CANCELED(c@/!)")))
+#+END_SRC
+
 *** Org Mobile
 #+BEGIN_SRC emacs-lisp
 (setq org-mobile-directory "/sshx:calendar:/home/calendar/MobileOrg/")
@@ -158,8 +167,11 @@ Manage programming projects in Emacs
   
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 #+END_SRC
-
-
+*** Version Control
+Get a modeline icon for git
+#+BEGIN_SRC emacs-lisp
+(require 'git-emacs)
+#+END_SRC
 
 
 
