@@ -54,6 +54,7 @@ Emacs Beard Level:  Wizard
   (tooltip-mode -1)
   (tool-bar-mode -1)
   (menu-bar-mode -1)
+  (column-number-mode 1)
   (scroll-bar-mode -1))
 #+END_SRC
 *** Change Yes and No to Y and N
@@ -95,6 +96,12 @@ Set up Spell Checking
  ;   (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
   ;    (add-hook hook (lambda () (flyspell-mode -1))))
 #+END_SRC
+*** Latex
+Turn on Auto Complete for Latex buffers and set up citation
+#+BEGIN_SRC emacs-lisp
+(require 'auto-complete-auctex)
+(setq reftex-plug-into-AUCTeX t)
+#+END_SRC
 ** Org
 *** Keybindings
 #+BEGIN_SRC emacs-lisp
@@ -121,6 +128,17 @@ Set up Spell Checking
 (setq org-default-notes-file "~/Notes/gtd.org")
 #+END_SRC
 
+*** Templates
+Capture templates and other Fill in Stuff
+##+BEGIN_SRC emacs-lisp
+(setq org-capture-templates
+        `(("n" "NEXT" entry
+           (file+headline "~/Notes/gtd.org" "Inbox")
+           ,my/org-basic-task-template)
+          ("T" "Quick task" entry
+           (file+headline "~/personal/organizer.org" "Inbox")
+           "* TODO %^{Task}\nSCHEDULED: %t\n"
+           :immediate-finish t)
 ** Programming
 *** Projectile
 Manage programming projects in Emacs
