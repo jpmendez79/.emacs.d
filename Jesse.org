@@ -26,8 +26,10 @@ Sets up Latitude and Longitude for Weather Reports and Sunrise/Sunset Settings
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/local-lisp")
 (add-to-list 'load-path "~/.emacs.d/local-lisp/git-emacs-master")
+(add-to-list 'load-path "~/.emacs.d/local-lisp/async")
+(add-to-list 'load-path "~/.emacs.d/local-lisp/helm")
 (unless (package-installed-p 'use-package)
-  (package-install 'use-package))
+ (package-install 'use-package))
 (setq use-package-verbose t)
 (require 'use-package)
 (use-package auto-compile
@@ -54,6 +56,7 @@ Emacs Beard Level:  Wizard
   (tooltip-mode -1)
   (tool-bar-mode -1)
   (menu-bar-mode -1)
+  (display-time-mode 1)
   (column-number-mode 1)
   (scroll-bar-mode -1))
 #+END_SRC
@@ -76,6 +79,39 @@ My current flavor of the month
 (autopair-global-mode)
 (show-paren-mode t)
 (setq-default highlight-tabs t)
+#+END_SRC
+*** Helm Mode
+#+BEGIN_SRC emacs-lisp
+(use-package helm
+  :ensure t
+  :diminish helm-mode
+  :init
+  (progn
+    (require 'helm-config)
+    (setq helm-candidate-number-limit 100)
+    ;; From https://gist.github.com/antifuchs/9238468
+    (setq helm-idle-delay 0.0 ; update fast sources immediately (doesn't).
+          helm-input-idle-delay 0.01  ; this actually updates things
+                                        ; reeeelatively quickly.
+          helm-yas-display-key-on-candidate t
+          helm-quick-update t
+          helm-M-x-requires-pattern nil
+          helm-ff-skip-boring-files t)
+    (helm-mode))
+  :bind (("C-c h" . helm-mini)
+         ("C-h a" . helm-apropos)
+         ("C-x C-b" . helm-buffers-list)
+         ("C-x b" . helm-buffers-list)
+         ("M-y" . helm-show-kill-ring)
+         ("M-x" . helm-M-x)
+         ("C-x c o" . helm-occur)
+         ("C-x c s" . helm-swoop)
+         ("C-x c y" . helm-yas-complete)
+         ("C-x c Y" . helm-yas-create-snippet-on-region)
+         ("C-x c b" . my/helm-do-grep-book-notes)
+         ("C-x c SPC" . helm-all-mark-rings)
+))
+(ido-mode -1) ;; Turn off ido mode in case I enabled it accidentall
 #+END_SRC
 ** Writing
 *** Appearence
@@ -190,16 +226,3 @@ Get a modeline icon for git
 #+BEGIN_SRC emacs-lisp
 (require 'git-emacs)
 #+END_SRC
-*** Dick around
-
-
-
-
-
-
-
-
-
-
-
-
