@@ -190,6 +190,7 @@ Get a modeline icon for git
 #+BEGIN_SRC emacs-lisp
 (require 'git-emacs)
 #+END_SRC
+*** Dick around
 
 
 
