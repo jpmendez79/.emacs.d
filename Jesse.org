@@ -113,6 +113,11 @@ My current flavor of the month
 ))
 (ido-mode -1) ;; Turn off ido mode in case I enabled it accidentall
 #+END_SRC
+*** Line Numbers
+I like Line Numbers
+#+BEGIN_SRC emacs-lisp
+(column-number-mode 1)
+#+END_SRC
 ** Writing
 *** Appearence
 Use Visual Line Mode so it reads nice, but doesn't mess with the actual file
@@ -166,15 +171,15 @@ Turn on Auto Complete for Latex buffers and set up citation
 
 *** Templates
 Capture templates and other Fill in Stuff
-##+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq org-capture-templates
-        `(("n" "NEXT" entry
-           (file+headline "~/Notes/gtd.org" "Inbox")
-           ,my/org-basic-task-template)
-          ("T" "Quick task" entry
-           (file+headline "~/personal/organizer.org" "Inbox")
-           "* TODO %^{Task}\nSCHEDULED: %t\n"
-           :immediate-finish t)
+        `(("i" "Save a thought for processing" entry
+           (file+headline "~/Notes/gtd.org" "Inbox"))
+           ("a" "Save an appointment" entry
+           (file+headline "~/Notes/gtd.org" "Calendar")
+           "* APPT %^{Task}\nSCHEDULED: %t\n"
+           :immediate-finish t)))
+#+END_SRC
 ** Programming
 *** Projectile
 Manage programming projects in Emacs
@@ -225,4 +230,25 @@ Manage programming projects in Emacs
 Get a modeline icon for git
 #+BEGIN_SRC emacs-lisp
 (require 'git-emacs)
+#+END_SRC
+*** Snippets
+Initialize yasnippets
+#+BEGIN_SRC emacs-lisp
+
+(use-package yasnippet
+  :ensure t
+  :diminish yas-minor-mode
+  :init (yas-global-mode)
+  :config
+  (progn
+    (yas-global-mode)
+    (add-hook 'hippie-expand-try-functions-list 'yas-hippie-try-expand)
+    (setq yas-key-syntaxes '("w_" "w_." "^ "))
+    (setq yas-installed-snippets-dir "~/.emacs.d/yasnippet-snippets")
+    (setq yas-expand-only-for-last-commands nil)
+    (yas-global-mode 1)
+    (bind-key "\t" 'hippie-expand yas-minor-mode-map)
+    (add-to-list 'yas-prompt-functions 'shk-yas/helm-prompt)))
+;;        (global-set-key (kbd "C-c y") (lambda () (interactive)
+;;                                         (yas/load-directory "~/elisp/snippets")))
 #+END_SRC
