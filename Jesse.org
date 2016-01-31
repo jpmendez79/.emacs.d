@@ -47,6 +47,7 @@ Load through a seperate file, so I can VC this file more easily
 Hide the Emacs Poo
 #+BEGIN_SRC emacs-lisp
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
+(setq delete-old-versions t) 
 #+END_SRC
 *** Windows Configuration
 Emacs Beard Level:  Wizard
