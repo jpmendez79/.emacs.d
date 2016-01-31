@@ -144,6 +144,11 @@ Turn on Auto Complete for Latex buffers and set up citation
 (setq reftex-plug-into-AUCTeX t)
 #+END_SRC
 ** Org
+#+BEGIN_SRC
+(use-package org
+   :ensure t
+)
+#+END_SRC
 *** Keybindings
 #+BEGIN_SRC emacs-lisp
 (global-set-key "\C-cl" 'org-store-link)
@@ -169,6 +174,11 @@ Turn on Auto Complete for Latex buffers and set up citation
 (setq org-default-notes-file "~/Notes/gtd.org")
 #+END_SRC
 
+*** Time Clocking
+#+BEGIN_SRC emacs-lisp
+(setq org-clock-persist 'history)
+(org-clock-persistence-insinuate)
+#+END_SRC
 *** Templates
 Capture templates and other Fill in Stuff
 #+BEGIN_SRC emacs-lisp
