@@ -149,6 +149,7 @@ Turn on Auto Complete for Latex buffers and set up citation
 (use-package org
    :ensure t
 )
+(require 'org-page)
 #+END_SRC
 *** Keybindings
 #+BEGIN_SRC emacs-lisp
