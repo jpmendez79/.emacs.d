@@ -28,6 +28,7 @@ Sets up Latitude and Longitude for Weather Reports and Sunrise/Sunset Settings
 (add-to-list 'load-path "~/.emacs.d/local-lisp/git-emacs-master")
 (add-to-list 'load-path "~/.emacs.d/local-lisp/async")
 (add-to-list 'load-path "~/.emacs.d/local-lisp/helm")
+(add-to-list 'load-path "~/.emacs.d/local-lisp/bbdb-3.1.2/lisp")
 (unless (package-installed-p 'use-package)
  (package-install 'use-package))
 (setq use-package-verbose t)
@@ -37,7 +38,7 @@ Sets up Latitude and Longitude for Weather Reports and Sunrise/Sunset Settings
   :config (auto-compile-on-load-mode))
 (setq load-prefer-newer t)
 #+END_SRC
-*** Load Passwords and Stuff
+*** Load Stuff
 Load through a seperate file, so I can VC this file more easily
 #+BEGIN_SRC emacs-lisp
 ;(load ~/.emacs.secrets t)
@@ -60,6 +61,8 @@ Emacs Beard Level:  Wizard
   (display-time-mode 1)
   (column-number-mode 1)
   (scroll-bar-mode -1))
+(require 'win-switch)
+(win-switch-setup-keys-ijkl "\C-xo")
 #+END_SRC
 *** Change Yes and No to Y and N
 Change this because I am a lazy bastard
@@ -69,8 +72,13 @@ Change this because I am a lazy bastard
 *** Theme Settings
 My current flavor of the month
 #+BEGIN_SRC emacs-lisp
-(require 'moe-theme)
-(require 'moe-theme-switcher)
+(use-package moe-theme
+   :ensure t
+   :config 
+   (require 'moe-theme)
+   (require 'moe-theme-switcher))
+;(require 'moe-theme)
+;(require 'moe-theme-switcher)
 #+END_SRC
 *** Autocomplete and AutoPair
 #+BEGIN_SRC emacs-lisp
@@ -119,6 +127,135 @@ I like Line Numbers
 #+BEGIN_SRC emacs-lisp
 (column-number-mode 1)
 #+END_SRC
+*** Setup BBDB
+#+BEGIN_SRC emacs-lisp
+  (require 'bbdb)
+  (setq bbdb-file "~/.emacs.d/bbdb")
+  ;; (setq bbdb-complete-name-full-completion t)
+  ;; (setq bbdb-completion-type 'primary-or-name)
+  ;; (setq bbdb-complete-name-allow-cycling t)
+  ;; (setq
+  ;; bbdb-offer-save 1
+  ;; bbdb-use-pop-up t
+  ;; bbdb-electric-p t
+  ;; bbdb-popup-target-lines  1
+  ;; )
+#+END_SRC
+*** MIME Stuff
+#+BEGIN_SRC emacs-lisp
+  ;; (setq browse-url-browser-function 'browse-url-generic
+  ;;       browse-url-generic-program "chrome")
+(setq browse-url-browser-function 'eww-browse-url)
+#+END_SRC
+*** LDAP Stuff
+#+BEGIN_SRC emacs-lisp
+  (require 'eudc)
+  ;; (with-eval-after-load "message"
+  ;;   (define-key message-mode-map [(control ?c) (tab)] 'eudc-expand-inline))
+  ;; (with-eval-after-load "sendmail"
+  ;;   (define-key mail-mode-map [(control ?c) (tab)] 'eudc-expand-inline))
+
+  (with-eval-after-load "message"
+    (define-key message-mode-map (kbd "TAB") 'eudc-expand-inline))
+  (setq eudc-server-hotlist 
+       '(("" . bbdb)
+          ("ldap://localhost:1389" . ldap)))
+  (setq ldap-host-parameters-alist
+        '(("ldap://localhost:1389"
+           base "ou=Exchange Administrative Group (FYDIBOHF23SPDLT),dc=localhost,dc=localhost"
+  ;        base "o=od"
+  ;         base "o=El Camino Community College"
+;           base "ou=addressbook"
+ ;          base "ou=adressbook"
+;	   binddn "cn=Recipients,cn=jesse_mendez272,jesse_mendez@elcamino.edu"
+           binddn "jesse_mendez@elcamino.edu"
+           passwd "bortan05")))
+
+  (setq eudc-inline-query-format '((name)
+                                   (firstname)
+                                   (firstname name)))
+
+  (eudc-protocol-set 'eudc-inline-query-format
+                     '((sn)
+                       (sn sn)
+                       (sn sn sn))
+                     'ldap)
+
+
+    ;; (setq eudc-default-return-attributes nil
+    ;;       eudc-strict-return-matches nil)
+
+    ;; (setq ldap-ldapsearch-args (quote ("-tt" "-LLL" "-x")))
+    ;; (setq eudc-inline-query-format '((name)
+    ;;                                  (firstname)
+    ;;                                  (firstname name)
+    ;;                                  (email)
+    ;;                                  ))
+
+    ;; (setq ldap-host-parameters-alist
+    ;;       (quote (("localhost" base "ou=people,dc=your_dc_here,dc=fr"
+    ;;                binddn "cn=admin,dc=your_dc_here,dc=fr"
+    ;;                passwd "your_password"))))
+
+    ;; (eudc-set-server "localhost:1389" 'ldap t)
+    ;; (setq eudc-server-hotlist '(("localhost" . ldap)))
+    ;; (setq eudc-inline-expansion-servers 'hotlist)
+
+    ;; (defun enz-eudc-expand-inline()
+    ;;   (interactive)
+    ;;   (move-end-of-line 1)
+    ;;   (insert "*")
+    ;;   (unless (condition-case nil
+    ;;               (eudc-expand-inline)
+    ;;             (error nil))
+    ;;     (backward-delete-char-untabify 1))
+    ;;   )
+
+    ;; ;; Adds some hooks
+
+    ;; (eval-after-load "message"
+    ;;   '(define-key message-mode-map (kbd "TAB") 'enz-eudc-expand-inline))
+    ;; (eval-after-load "sendmail"
+    ;;   '(define-key mail-mode-map (kbd "TAB") 'enz-eudc-expand-inline))
+    ;; (eval-after-load "post"
+    ;;   '(define-key post-mode-map (kbd "TAB") 'enz-eudc-expand-inline))
+    ;; (require 'ldap)
+    ;; (require 'eudc)
+
+    ;; (setq eudc-default-return-attributes nil
+    ;;       eudc-strict-return-matches nil)
+
+    ;; (setq ldap-ldapsearch-args (quote ("-tt" "-LLL" "-x")))
+    ;; (setq eudc-inline-query-format '((name)
+    ;;                                  (firstname)
+    ;;                                  (firstname name)
+    ;;                                  (email)
+    ;;                                  ))
+
+    ;; (setq ldap-host-parameters-alist
+    ;;       (quote (("your_server" base "ou=addressbook,dc=your_dc_here,dc=fr"
+    ;;                binddn "cn=admin,dc=your_dc_here,dc=fr"
+    ;;                passwd "your_password"))))
+
+    ;; (eudc-set-server "your_server" 'ldap t)
+    ;; (setq eudc-server-hotlist '(("your_server" . ldap)))
+    ;; (setq eudc-inline-expansion-servers 'hotlist)
+
+    ;; (defun enz-eudc-expand-inline()
+    ;;   (interactive)
+    ;;   (move-end-of-line 1)
+    ;;   (insert "*")
+    ;;   (unless (condition-case nil
+    ;;               (eudc-expand-inline)
+    ;;             (error nil))
+    ;;     (backward-delete-char-untabify 
+    ;; (eval-after-load "message"
+    ;;   '(define-key message-mode-map (kbd "TAB") 'enz-eudc-expand-inline))
+    ;; (eval-after-load "sendmail"
+    ;;   '(define-key mail-mode-map (kbd "TAB") 'enz-eudc-expand-inline))
+    ;; (eval-after-load "post"
+    ;;   '(define-key post-mode-map (kbd "TAB") 'enz-eudc-expand-inline))
+#+END_SRC
 ** Writing
 *** Appearence
 Use Visual Line Mode so it reads nice, but doesn't mess with the actual file
@@ -145,17 +282,21 @@ Turn on Auto Complete for Latex buffers and set up citation
 (setq reftex-plug-into-AUCTeX t)
 #+END_SRC
 ** Org
-#+BEGIN_SRC
+#+BEGIN_SRC emacs-lisp
 (use-package org
    :ensure t
 )
-(require 'org-page)
+(require 'org)
+;(require 'org-page)
+;(require 'org-drill)
+
 #+END_SRC
 *** Keybindings
 #+BEGIN_SRC emacs-lisp
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-ca" 'org-agenda)
+
 #+END_SRC
 *** Keywords
 #+BEGIN_SRC emacs-lisp
@@ -164,16 +305,54 @@ Turn on Auto Complete for Latex buffers and set up citation
         (sequence "WAITING(w@/!)" "APPT(a!)" )
         (sequence "|" "CANCELED(c@/!)")))
 #+END_SRC
-
+*** Agendas
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-custom-commands
+   '(("W" "Weekly Review"
+     ((agenda "" ((org-agenda-ndays 7))) ;; review upcoming deadlines and appointments
+                                           ;; type "l" in the agenda to review logged items 
+          (stuck "") ;; review stuck projects as designated by org-stuck-projects
+          (tags "projects") ;; review all projects (assuming you use todo keywords to designate projects)
+          (todo "MAYBE") ;; review someday/maybe items
+          (todo "WAITING"))) ;; review waiting items 
+         ("o" tags-todo "+office+anywhere")
+     ("p" tags-todo "+phone")
+     ("c" tags-todo "+campus+anywhere")
+     ("i" tags-todo "+internet")
+     ("l" tags-todo "+laptop")
+     ("m" tags-todo "+mom")
+     ("d" tags-todo "+dad")
+     ("g" tags-todo "gabi")
+     ("h" tags-todo "home")
+     ("e" tags-todo "errand+anywhere")
+     ("a" tags-todo "anywhere")
+        ))
+#+END_SRC
 *** Org Mobile
 #+BEGIN_SRC emacs-lisp
-(setq org-mobile-directory "/sshx:calendar:/home/calendar/MobileOrg/")
-(setq org-mobile-inbox-for-pull "/sshx:calendar:/home/calendar/MobileOrg/refile.org")
+  ;(setq org-mobile-directory "/sshx:calendar:/home/calendar/MobileOrg/")
+  ;(setq org-mobile-inbox-for-pull "/sshx:calendar:/home/calendar/MobileOrg/refile.org")
+  (setq org-mobile-directory "~/Dropbox/MobileOrg/")
+  (setq org-mobile-inbox-for-pull "~/Notes/refile.org")
+;;  (setq org-mobile-files "~/Notes/gtd.org")
+  ;; (defun org-post-savesync-hook()
+  ;;   "Run org push after saving file"
+  ;;   (message "Pushing to MobileOrg")
+  ;;   (org-mobile-push))
+  ;; (add-hook 'org-mode-hook
+  ;; 	  (lambda ()
+  ;; 	    (add-hook 'after-save-hook 'org-post-savesync-hook)))
 #+END_SRC
 *** Note Taking 
 #+BEGIN_SRC emacs-lisp
 (setq org-directory "~/Notes")
 (setq org-default-notes-file "~/Notes/gtd.org")
+(setq org-pretty-entities t)
+(add-hook 'org-mode-hook 'turn-on-org-cdlatex)
+(setq org-refile-targets '((nil :maxlevel . 9)
+                                (org-agenda-files :maxlevel . 9)))
+(setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
+(setq org-refile-use-outline-path t)                  ; Show full paths for refiling
 #+END_SRC
 
 *** Time Clocking
@@ -186,11 +365,33 @@ Capture templates and other Fill in Stuff
 #+BEGIN_SRC emacs-lisp
 (setq org-capture-templates
         `(("i" "Save a thought for processing" entry
-           (file+headline "~/Notes/gtd.org" "Inbox"))
+           (file "~/Notes/gtd.org")
+	   "* ")
            ("a" "Save an appointment" entry
            (file+headline "~/Notes/gtd.org" "Calendar")
-           "* APPT %^{Task}\nSCHEDULED: %t\n"
+           "* APPT %t \nSCHEDULED: %t\n"
            :immediate-finish t)))
+#+END_SRC
+*** Blog
+#+BEGIN_SRC emacs-lisp
+(setq op/repository-directory "~/Projects/orgBlog")
+(setq op/site-domain "http://www.subject-matter.com/")
+#+END_SRC
+*** Babel
+#+BEGIN_SRC emacs-lisp
+;; active Org-babel languages
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '(;; other Babel languages
+   (plantuml . t)
+   (ledger . t)))
+#+END_SRC
+*** Encryption
+Setup Encrytption
+#+BEGIN_SRC emacs-lisp
+(require 'org-crypt)
+(org-crypt-use-before-save-magic)
+(setq org-tags-exclude-from-inheritance (quote ("crypt")))
 #+END_SRC
 ** Programming
 *** Projectile
@@ -201,16 +402,18 @@ Manage programming projects in Emacs
   :defer t
   :diminish projectile-mode
   :config
-  (progn
-    (setq projectile-keymap-prefix (kbd "C-c p"))
-    (setq projectile-completion-system 'default)
-    (setq projectile-enable-caching t)
-    (setq projectile-indexing-method 'alien)
-    (add-to-list 'projectile-globally-ignored-files "node-modules"))
+  (projectile-global-mode)
+  ;(setq projectile-keymap-prefix (kbd "C-c p"))
+;  (setq projectile-completion-system 'default)
+;  (setq projectile-enable-caching t)
+  (setq projectile-indexing-method 'native)
+;  (add-to-list 'projectile-globally-ignored-files "node-modules")
   :config
-  (projectile-global-mode))
-  ;(use-package helm-projectile
-   ;  :defer t :ensure t)
+)
+(use-package helm-projectile
+  :defer t 
+  :ensure t
+)
 #+END_SRC
 
 *** Emacs Lisp Development
@@ -238,6 +441,15 @@ Manage programming projects in Emacs
   
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 #+END_SRC
+*** Python
+#+BEGIN_SRC emacs-lisp
+(use-package auto-virtualenv
+    :ensure t)
+(require 'auto-virtualenv)
+(add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
+(add-hook 'python-mode-hook 'anaconda-mode)
+(add-hook 'python-mode-hook 'anaconda-eldoc-mode)
+#+END_SRC
 *** Version Control
 Get a modeline icon for git
 #+BEGIN_SRC emacs-lisp
@@ -263,4 +475,16 @@ Initialize yasnippets
     (add-to-list 'yas-prompt-functions 'shk-yas/helm-prompt)))
 ;;        (global-set-key (kbd "C-c y") (lambda () (interactive)
 ;;                                         (yas/load-directory "~/elisp/snippets")))
+#+END_SRC
+** Multimedia
+*** EMMS
+#+BEGIN_SRC emacs-lisp
+
+(use-package emms
+   :ensure t
+   :config
+   (require 'emms-setup)
+   (emms-all)
+   (emms-default-players)
+   (setq emms-source-file-default-directory "~/Music/"))
 #+END_SRC
