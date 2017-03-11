@@ -453,7 +453,18 @@ Manage programming projects in Emacs
 ;(add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
 ;(add-hook 'python-mode-hook 'anaconda-mode)
 ;(add-hook 'python-mode-hook 'anaconda-eldoc-mode)
-(elpy-enable)
+(elpy-enable )
+(setq python-shell-interpreter "python3")
+(with-eval-after-load 'python
+  (defun python-shell-completion-native-try ()
+    "Return non-nil if can trigger native completion."
+    (let ((python-shell-completion-native-enable t)
+          (python-shell-completion-native-output-timeout
+           python-shell-completion-native-try-output-timeout))
+      (python-shell-completion-native-get-completions
+       (get-buffer-process (current-buffer))
+       nil "_"))))
+;(setq python-shell-interpreter-args "--colors=Linux --profile=default")
 #+END_SRC
 *** Version Control
 Get a modeline icon for git
