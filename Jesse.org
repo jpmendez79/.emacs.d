@@ -42,7 +42,7 @@ Sets up Latitude and Longitude for Weather Reports and Sunrise/Sunset Settings
 Load through a seperate file, so I can VC this file more easily
 #+BEGIN_SRC emacs-lisp
 ;(load ~/.emacs.secrets t)
-(setq gnus-init-file "~/.emacs.d/.gnus")
+(setq gnus-init-file "~/.emacs.d/gnus.el")
 #+END_SRC
 ** General Configuration
 *** Backups
@@ -447,9 +447,13 @@ Manage programming projects in Emacs
 (use-package auto-virtualenv
     :ensure t)
 (require 'auto-virtualenv)
-(add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
-(add-hook 'python-mode-hook 'anaconda-mode)
-(add-hook 'python-mode-hook 'anaconda-eldoc-mode)
+(defun my-python-mode-hook () 
+  (linum-mode 1)) 
+(add-hook 'python-mode-hook 'my-python-mode-hook) 
+;(add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
+;(add-hook 'python-mode-hook 'anaconda-mode)
+;(add-hook 'python-mode-hook 'anaconda-eldoc-mode)
+(elpy-enable)
 #+END_SRC
 *** Version Control
 Get a modeline icon for git
