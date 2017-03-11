@@ -42,6 +42,7 @@ Sets up Latitude and Longitude for Weather Reports and Sunrise/Sunset Settings
 Load through a seperate file, so I can VC this file more easily
 #+BEGIN_SRC emacs-lisp
 ;(load ~/.emacs.secrets t)
+(setq gnus-init-file "~/.emacs.d/.gnus")
 #+END_SRC
 ** General Configuration
 *** Backups
