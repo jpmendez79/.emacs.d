@@ -385,7 +385,8 @@ Capture templates and other Fill in Stuff
  'org-babel-load-languages
  '(;; other Babel languages
    (plantuml . t)
-   (ledger . t)))
+   (ledger . t)
+   (python . t)))
 #+END_SRC
 *** Encryption
 Setup Encrytption
