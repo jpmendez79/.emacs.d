@@ -326,7 +326,7 @@ Turn on Auto Complete for Latex buffers and set up citation
      ("g" tags-todo "gabi")
      ("h" tags-todo "home")
      ("e" tags-todo "errand+anywhere")
-     ("a" tags-todo "anywhere")
+     ("w" tags-todo "anywhere")
         ))
 #+END_SRC
 *** Org Mobile
