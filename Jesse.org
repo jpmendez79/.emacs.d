@@ -299,6 +299,10 @@ Turn on Auto Complete for Latex buffers and set up citation
 (global-set-key "\C-ca" 'org-agenda)
 
 #+END_SRC
+*** Tags
+#+BEGIN_SRC emacs-lisp
+(setq org-tags-exclude-from-inheritance "project")
+#+END_SRC
 *** Keywords
 #+BEGIN_SRC emacs-lisp
 (setq org-todo-keywords
@@ -308,12 +312,14 @@ Turn on Auto Complete for Latex buffers and set up citation
 #+END_SRC
 *** Agendas
 #+BEGIN_SRC emacs-lisp
+(setq org-stuck-projects
+   '("+LEVEL=1+project/-SOMEDAY-DONE-WAITING" ("NEXT") nil "\\<IGNORE\\>"))
 (setq org-agenda-custom-commands
    '(("W" "Weekly Review"
      ((agenda "" ((org-agenda-ndays 7))) ;; review upcoming deadlines and appointments
                                            ;; type "l" in the agenda to review logged items 
           (stuck "") ;; review stuck projects as designated by org-stuck-projects
-          (tags "projects") ;; review all projects (assuming you use todo keywords to designate projects)
+          (tags "project") ;; review all projects (assuming you use todo keywords to designate projects)
           (todo "MAYBE") ;; review someday/maybe items
           (todo "WAITING"))) ;; review waiting items 
          ("o" tags-todo "+office+anywhere")
