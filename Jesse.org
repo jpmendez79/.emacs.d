@@ -1,6 +1,17 @@
 #+Title Jesse Mendez's Emacs Configuration
 #+OPTIONS: toc:4 h:4
 * Configuration
+** Stub Loading Code
+Save as init.el, it contains the required code to load this .org file
+#+BEGIN_SRC emacs-lisp
+  ;; ;;; Emacs Init to Load an Awesome Org Config File
+
+  ;; ;; Initialization
+  ;; (package-initialize nil)
+  ;; (setq package-enable-at-startup nil)
+  ;; ;;Loading Package Archives
+  ;; (org-babel-load-file "~/.emacs.d/Jesse.org")
+#+END_SRC
 ** Personal Information
 #+BEGIN_SRC emacs-lisp
 (setq user-full-name "Jesse Mendez"
@@ -44,6 +55,16 @@ Load through a seperate file, so I can VC this file more easily
 ;(load ~/.emacs.secrets t)
 (setq gnus-init-file "~/.emacs.d/gnus.el")
 #+END_SRC
+*** Exwm
+#+BEGIN_SRC emacs-lisp
+(display-time-mode t)
+(require 'exwm)
+(require 'exwm-config)
+(require 'exwm-systemtray)
+(exwm-systemtray-enable)
+(exwm-config-default)
+;;(exwm-input-set-key (kdb "s-m") #'exwm-workspace-move-window)
+#+END_SRC
 ** General Configuration
 *** Backups
 Hide the Emacs Poo
@@ -52,13 +73,12 @@ Hide the Emacs Poo
 (setq delete-old-versions t) 
 #+END_SRC
 *** Windows Configuration
-Emacs Beard Level:  Wizard
 #+BEGIN_SRC emacs-lisp
 (require 'uniquify)
 (when window-system
   (tooltip-mode -1)
   (tool-bar-mode -1)
-  (menu-bar-mode -1)
+  (menu-bar-mode 1)
   (display-time-mode 1)
   (column-number-mode 1)
   (scroll-bar-mode -1))
@@ -71,7 +91,6 @@ Change this because I am a lazy bastard
 (fset 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 *** Theme Settings
-My current flavor of the month
 #+BEGIN_SRC emacs-lisp
 (use-package moe-theme
    :ensure t
@@ -146,9 +165,12 @@ I like Line Numbers
 #+BEGIN_SRC emacs-lisp
   ;; (setq browse-url-browser-function 'browse-url-generic
   ;;       browse-url-generic-program "chrome")
-(setq browse-url-browser-function 'eww-browse-url)
+;;(setq browse-url-browser-function 'eww-browse-url)
+(setq browse-url-browser-function 'browse-url-firefox)
 #+END_SRC
+
 *** LDAP Stuff
+Remove this
 #+BEGIN_SRC emacs-lisp
   (require 'eudc)
   ;; (with-eval-after-load "message"
@@ -257,6 +279,52 @@ I like Line Numbers
     ;; (eval-after-load "post"
     ;;   '(define-key post-mode-map (kbd "TAB") 'enz-eudc-expand-inline))
 #+END_SRC
+*** Multiple Cursers
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-c m c") 'mc/edit-lines)
+#+END_SRC
+*** Email
+#+BEGIN_SRC emacs-lisp
+   ;; (require 'notmuch)
+   ;; (setq notmuch-search-oldest-first nil)
+   (setq mail-user-agent 'message-user-agent)
+   (setq message-send-mail-function 'message-send-mail-with-sendmail)
+   (setq send-mail-function 'message-sendmail-with-sendmail)
+   (setq sendmail-program "/usr/bin/msmtp")
+   (setq mail-specify-envelope-from t)
+  (setq message-sendmail-envelope-from "header")
+   ;; This is needed to allow msmtp to do its magic:
+   (setq message-sendmail-f-is-evil 't)
+   (setq message-sendmail-extra-arguments '("--read-envelope-from"))
+   (setq my-email-addresses '("jesse_mendez@elcamino.edu"
+			     "jessepmendez79@gmail.com"))
+   (setq gnus-from-selected-index 0)
+   (defun gnus-loop-from ()
+     (interactive)
+     (setq gnus-article-current-point (point))
+     (goto-char (point-min))
+     (if (eq gnus-from-selected-index (length my-email-addresses))
+	 (setq gnus-from-selected-index 0) nil)
+     (while (re-search-forward "^From:.*$" nil t)
+       (replace-match (concat "From: " user-full-name " <" (nth gnus-from-selected-index my-email-addresses) ">")))
+     (goto-char gnus-article-current-point)
+     (setq gnus-from-selected-index (+ gnus-from-selected-index 1)))
+
+   (global-set-key (kbd "C-c f") 'gnus-loop-from)
+
+#+END_SRC
+*** Terminal stuff
+#+BEGIN_SRC emacs-lisp
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+(add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
+(add-hook 'eshell-preoutput-filter-functions
+           'ansi-color-filter-apply)
+(setq eshell-prompt-function (lambda nil
+    (concat
+     (propertize (eshell/pwd) 'face `(:foreground "blue"))
+     (propertize "  λ " 'face `(:foreground "bold white")))))
+  (setq eshell-highlight-prompt nil)
+#+END_SRC
 ** Writing
 *** Appearence
 Use Visual Line Mode so it reads nice, but doesn't mess with the actual file
@@ -297,7 +365,7 @@ Turn on Auto Complete for Latex buffers and set up citation
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-ca" 'org-agenda)
-
+(global-set-key "\C-c." 'org-time-stamp)
 #+END_SRC
 *** Tags
 #+BEGIN_SRC emacs-lisp
@@ -306,9 +374,9 @@ Turn on Auto Complete for Latex buffers and set up citation
 *** Keywords
 #+BEGIN_SRC emacs-lisp
 (setq org-todo-keywords
-      '((sequence "NEXT(n!)" "|" "DONE(d!)")
-        (sequence "WAITING(w@/!)" "APPT(a!)" )
-        (sequence "|" "CANCELED(c@/!)")))
+      '((sequence "NEXT(n)" "|" "DONE(d)" "Delegated(D)")
+        (sequence "WAITING(w)" "APPT(a)" )
+        (sequence "|" "CANCELED(c)")))
 #+END_SRC
 *** Agendas
 #+BEGIN_SRC emacs-lisp
@@ -319,45 +387,38 @@ Turn on Auto Complete for Latex buffers and set up citation
      ((agenda "" ((org-agenda-ndays 7))) ;; review upcoming deadlines and appointments
                                            ;; type "l" in the agenda to review logged items 
           (stuck "") ;; review stuck projects as designated by org-stuck-projects
-          (tags "project") ;; review all projects (assuming you use todo keywords to designate projects)
-          (todo "MAYBE") ;; review someday/maybe items
+          (tags "+LEVEL=1+project-someday") ;; review all projects (assuming you use todo keywords to designate projects)
+          (tags "+LEVEL=2+someday") ;; review someday/maybe items
           (todo "WAITING"))) ;; review waiting items 
-         ("o" tags-todo "+office+anywhere")
-     ("p" tags-todo "+phone")
-     ("c" tags-todo "+campus+anywhere")
-     ("i" tags-todo "+internet")
-     ("l" tags-todo "+laptop")
-     ("m" tags-todo "+mom")
-     ("d" tags-todo "+dad")
-     ("g" tags-todo "gabi")
-     ("h" tags-todo "home")
-     ("e" tags-todo "errand+anywhere")
-     ("w" tags-todo "anywhere")
+         ("o" tags-todo "@office-someday")
+     ("p" tags-todo "phone-someday")
+     ("c" tags-todo "@campus-someday")
+     ("i" tags-todo "@internet-someday")
+     ("l" tags-todo "@laptop-someday")
+     ("m" tags-todo "mom-someday")
+     ("d" tags-todo "dad-someday")
+     ("g" tags-todo "gabi-someday")
+     ("h" tags-todo "@home-someday")
+     ("e" tags-todo "@errand-someday")
+     ("w" tags-todo "@anywhere-someday")
         ))
 #+END_SRC
 *** Org Mobile
 #+BEGIN_SRC emacs-lisp
-  ;(setq org-mobile-directory "/sshx:calendar:/home/calendar/MobileOrg/")
-  ;(setq org-mobile-inbox-for-pull "/sshx:calendar:/home/calendar/MobileOrg/refile.org")
-  (setq org-mobile-directory "~/Dropbox/MobileOrg/")
-  (setq org-mobile-inbox-for-pull "~/Notes/refile.org")
-;;  (setq org-mobile-files "~/Notes/gtd.org")
-  ;; (defun org-post-savesync-hook()
-  ;;   "Run org push after saving file"
-  ;;   (message "Pushing to MobileOrg")
-  ;;   (org-mobile-push))
-  ;; (add-hook 'org-mode-hook
-  ;; 	  (lambda ()
-  ;; 	    (add-hook 'after-save-hook 'org-post-savesync-hook)))
+(setq org-mobile-directory "/sshx:calendar:/home/pi/MobileOrg/")
+(setq org-mobile-inbox-for-pull "/sshx:calendar:/home/calendar/MobileOrg/refile.org")
+;(setq org-mobile-directory "~/Dropbox/MobileOrg/")
+(setq org-mobile-inbox-for-pull "~/Notes/refile.org")
+(setq org-agenda-files '("~/Notes/gtd.org"
+                         "~/Notes/tickler.org"
+			 "~/Notes/inbox.org"))
 #+END_SRC
 *** Note Taking 
 #+BEGIN_SRC emacs-lisp
 (setq org-directory "~/Notes")
-(setq org-default-notes-file "~/Notes/gtd.org")
+(setq org-default-notes-file "~/Notes/inbox.org")
 (setq org-pretty-entities t)
 (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
-(setq org-refile-targets '((nil :maxlevel . 9)
-                                (org-agenda-files :maxlevel . 9)))
 (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
 (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
 #+END_SRC
@@ -370,14 +431,15 @@ Turn on Auto Complete for Latex buffers and set up citation
 *** Templates
 Capture templates and other Fill in Stuff
 #+BEGIN_SRC emacs-lisp
-(setq org-capture-templates
-        `(("i" "Save a thought for processing" entry
-           (file "~/Notes/gtd.org")
-	   "* ")
-           ("a" "Save an appointment" entry
-           (file+headline "~/Notes/gtd.org" "Calendar")
-           "* APPT %t \nSCHEDULED: %t\n"
-           :immediate-finish t)))
+(setq org-refile-targets '(("~/Notes/gtd.org" :maxlevel . 3)
+                           ("~/Notes/someday.org" :level . 1)
+                           ("~/Notes/tickler.org" :maxlevel . 2)))
+(setq org-capture-templates 
+                         '(("i" "Save a thought" entry (file "~/Notes/inbox.org")
+			        "* %?")
+			   ("n" "Save a NEXT action item" entry (file "~/Notes/inbox.org")
+                                "* NEXT %^G%?")))
+			   
 #+END_SRC
 *** Blog
 #+BEGIN_SRC emacs-lisp
@@ -401,6 +463,18 @@ Setup Encrytption
 (org-crypt-use-before-save-magic)
 (setq org-tags-exclude-from-inheritance (quote ("crypt")))
 #+END_SRC
+*** Timestamps
+#+BEGIN_SRC emacs-lisp
+(setq org-display-custom-times t)
+(setq org-time-stamp-custom-formats '("<%b %e, %Y>" . "<%b %e, %Y %H:%M>"))
+#+END_SRC
+*** Calendar
+#+BEGIN_SRC emacs-lisp
+;;(require 'org-gcal)
+                            
+
+#+END_SRC
+
 ** Programming
 *** Projectile
 Manage programming projects in Emacs
@@ -425,7 +499,7 @@ Manage programming projects in Emacs
 #+END_SRC
 
 *** Emacs Lisp Development
-#BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
     (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
     (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
@@ -511,3 +585,8 @@ Initialize yasnippets
    (emms-default-players)
    (setq emms-source-file-default-directory "~/Music/"))
 #+END_SRC
+** Remote
+#+BEGIN_SRC emacs-lisp
+(setq ange-fpt-ftp-program-name "ncftp")
+#+END_SRC
+
