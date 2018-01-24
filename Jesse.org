@@ -23,7 +23,6 @@ Sets up Latitude and Longitude for Weather Reports and Sunrise/Sunset Settings
 (setq calendar-latitude 33.7)
 (setq calendar-longitude -118.3)
 #+END_SRC
-
 ** Emacs Initialization
 *** Package Sources
 #+BEGIN_SRC emacs-lisp
@@ -36,10 +35,6 @@ Sets up Latitude and Longitude for Weather Reports and Sunrise/Sunset Settings
 *** Personal Lisp Directories and Other Load Paths
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/local-lisp")
-(add-to-list 'load-path "~/.emacs.d/local-lisp/git-emacs-master")
-(add-to-list 'load-path "~/.emacs.d/local-lisp/async")
-(add-to-list 'load-path "~/.emacs.d/local-lisp/helm")
-(add-to-list 'load-path "~/.emacs.d/local-lisp/bbdb-3.1.2/lisp")
 (unless (package-installed-p 'use-package)
  (package-install 'use-package))
 (setq use-package-verbose t)
@@ -97,8 +92,6 @@ Change this because I am a lazy bastard
    :config 
    (require 'moe-theme)
    (require 'moe-theme-switcher))
-;(require 'moe-theme)
-;(require 'moe-theme-switcher)
 #+END_SRC
 *** Autocomplete and AutoPair
 #+BEGIN_SRC emacs-lisp
@@ -149,8 +142,8 @@ I like Line Numbers
 #+END_SRC
 *** Setup BBDB
 #+BEGIN_SRC emacs-lisp
-  (require 'bbdb)
-  (setq bbdb-file "~/.emacs.d/bbdb")
+(require 'bbdb)
+(setq bbdb-file "~/.emacs.d/bbdb")
   ;; (setq bbdb-complete-name-full-completion t)
   ;; (setq bbdb-completion-type 'primary-or-name)
   ;; (setq bbdb-complete-name-allow-cycling t)
@@ -163,167 +156,35 @@ I like Line Numbers
 #+END_SRC
 *** MIME Stuff
 #+BEGIN_SRC emacs-lisp
-  ;; (setq browse-url-browser-function 'browse-url-generic
-  ;;       browse-url-generic-program "chrome")
-;;(setq browse-url-browser-function 'eww-browse-url)
 (setq browse-url-browser-function 'browse-url-firefox)
-#+END_SRC
-
-*** LDAP Stuff
-Remove this
-#+BEGIN_SRC emacs-lisp
-  (require 'eudc)
-  ;; (with-eval-after-load "message"
-  ;;   (define-key message-mode-map [(control ?c) (tab)] 'eudc-expand-inline))
-  ;; (with-eval-after-load "sendmail"
-  ;;   (define-key mail-mode-map [(control ?c) (tab)] 'eudc-expand-inline))
-
-  (with-eval-after-load "message"
-    (define-key message-mode-map (kbd "TAB") 'eudc-expand-inline))
-  (setq eudc-server-hotlist 
-       '(("" . bbdb)
-          ("ldap://localhost:1389" . ldap)))
-  (setq ldap-host-parameters-alist
-        '(("ldap://localhost:1389"
-           base "ou=Exchange Administrative Group (FYDIBOHF23SPDLT),dc=localhost,dc=localhost"
-  ;        base "o=od"
-  ;         base "o=El Camino Community College"
-;           base "ou=addressbook"
- ;          base "ou=adressbook"
-;	   binddn "cn=Recipients,cn=jesse_mendez272,jesse_mendez@elcamino.edu"
-           binddn "jesse_mendez@elcamino.edu"
-           passwd "bortan05")))
-
-  (setq eudc-inline-query-format '((name)
-                                   (firstname)
-                                   (firstname name)))
-
-  (eudc-protocol-set 'eudc-inline-query-format
-                     '((sn)
-                       (sn sn)
-                       (sn sn sn))
-                     'ldap)
-
-
-    ;; (setq eudc-default-return-attributes nil
-    ;;       eudc-strict-return-matches nil)
-
-    ;; (setq ldap-ldapsearch-args (quote ("-tt" "-LLL" "-x")))
-    ;; (setq eudc-inline-query-format '((name)
-    ;;                                  (firstname)
-    ;;                                  (firstname name)
-    ;;                                  (email)
-    ;;                                  ))
-
-    ;; (setq ldap-host-parameters-alist
-    ;;       (quote (("localhost" base "ou=people,dc=your_dc_here,dc=fr"
-    ;;                binddn "cn=admin,dc=your_dc_here,dc=fr"
-    ;;                passwd "your_password"))))
-
-    ;; (eudc-set-server "localhost:1389" 'ldap t)
-    ;; (setq eudc-server-hotlist '(("localhost" . ldap)))
-    ;; (setq eudc-inline-expansion-servers 'hotlist)
-
-    ;; (defun enz-eudc-expand-inline()
-    ;;   (interactive)
-    ;;   (move-end-of-line 1)
-    ;;   (insert "*")
-    ;;   (unless (condition-case nil
-    ;;               (eudc-expand-inline)
-    ;;             (error nil))
-    ;;     (backward-delete-char-untabify 1))
-    ;;   )
-
-    ;; ;; Adds some hooks
-
-    ;; (eval-after-load "message"
-    ;;   '(define-key message-mode-map (kbd "TAB") 'enz-eudc-expand-inline))
-    ;; (eval-after-load "sendmail"
-    ;;   '(define-key mail-mode-map (kbd "TAB") 'enz-eudc-expand-inline))
-    ;; (eval-after-load "post"
-    ;;   '(define-key post-mode-map (kbd "TAB") 'enz-eudc-expand-inline))
-    ;; (require 'ldap)
-    ;; (require 'eudc)
-
-    ;; (setq eudc-default-return-attributes nil
-    ;;       eudc-strict-return-matches nil)
-
-    ;; (setq ldap-ldapsearch-args (quote ("-tt" "-LLL" "-x")))
-    ;; (setq eudc-inline-query-format '((name)
-    ;;                                  (firstname)
-    ;;                                  (firstname name)
-    ;;                                  (email)
-    ;;                                  ))
-
-    ;; (setq ldap-host-parameters-alist
-    ;;       (quote (("your_server" base "ou=addressbook,dc=your_dc_here,dc=fr"
-    ;;                binddn "cn=admin,dc=your_dc_here,dc=fr"
-    ;;                passwd "your_password"))))
-
-    ;; (eudc-set-server "your_server" 'ldap t)
-    ;; (setq eudc-server-hotlist '(("your_server" . ldap)))
-    ;; (setq eudc-inline-expansion-servers 'hotlist)
-
-    ;; (defun enz-eudc-expand-inline()
-    ;;   (interactive)
-    ;;   (move-end-of-line 1)
-    ;;   (insert "*")
-    ;;   (unless (condition-case nil
-    ;;               (eudc-expand-inline)
-    ;;             (error nil))
-    ;;     (backward-delete-char-untabify 
-    ;; (eval-after-load "message"
-    ;;   '(define-key message-mode-map (kbd "TAB") 'enz-eudc-expand-inline))
-    ;; (eval-after-load "sendmail"
-    ;;   '(define-key mail-mode-map (kbd "TAB") 'enz-eudc-expand-inline))
-    ;; (eval-after-load "post"
-    ;;   '(define-key post-mode-map (kbd "TAB") 'enz-eudc-expand-inline))
 #+END_SRC
 *** Multiple Cursers
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-c m c") 'mc/edit-lines)
 #+END_SRC
-*** Email
-#+BEGIN_SRC emacs-lisp
-   ;; (require 'notmuch)
-   ;; (setq notmuch-search-oldest-first nil)
-   (setq mail-user-agent 'message-user-agent)
-   (setq message-send-mail-function 'message-send-mail-with-sendmail)
-   (setq send-mail-function 'message-sendmail-with-sendmail)
-   (setq sendmail-program "/usr/bin/msmtp")
-   (setq mail-specify-envelope-from t)
-  (setq message-sendmail-envelope-from "header")
-   ;; This is needed to allow msmtp to do its magic:
-   (setq message-sendmail-f-is-evil 't)
-   (setq message-sendmail-extra-arguments '("--read-envelope-from"))
-   (setq my-email-addresses '("jesse_mendez@elcamino.edu"
-			     "jessepmendez79@gmail.com"))
-   (setq gnus-from-selected-index 0)
-   (defun gnus-loop-from ()
-     (interactive)
-     (setq gnus-article-current-point (point))
-     (goto-char (point-min))
-     (if (eq gnus-from-selected-index (length my-email-addresses))
-	 (setq gnus-from-selected-index 0) nil)
-     (while (re-search-forward "^From:.*$" nil t)
-       (replace-match (concat "From: " user-full-name " <" (nth gnus-from-selected-index my-email-addresses) ">")))
-     (goto-char gnus-article-current-point)
-     (setq gnus-from-selected-index (+ gnus-from-selected-index 1)))
-
-   (global-set-key (kbd "C-c f") 'gnus-loop-from)
-
-#+END_SRC
 *** Terminal stuff
 #+BEGIN_SRC emacs-lisp
-(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
-(add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
-(add-hook 'eshell-preoutput-filter-functions
-           'ansi-color-filter-apply)
+(require 'eshell)
+(require 'xterm-color)
+(add-hook 'eshell-mode-hook
+          (lambda () (progn
+            (setq xterm-color-preserve-properties t)
+            (setenv "TERM" "xterm-256color"))))
+(add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
+
+(setq eshell-output-filter-functions
+    (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
+
+
+(progn (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter)
+       (setq comint-output-filter-functions (remove 'ansi-color-process-output comint-output-filter-functions)))
+
 (setq eshell-prompt-function (lambda nil
     (concat
      (propertize (eshell/pwd) 'face `(:foreground "blue"))
      (propertize "  λ " 'face `(:foreground "bold white")))))
   (setq eshell-highlight-prompt nil)
+(setq eshell-scroll-to-bottom-on-input t)
 #+END_SRC
 ** Writing
 *** Appearence
@@ -405,10 +266,9 @@ Turn on Auto Complete for Latex buffers and set up citation
 #+END_SRC
 *** Org Mobile
 #+BEGIN_SRC emacs-lisp
-(setq org-mobile-directory "/sshx:calendar:/home/pi/MobileOrg/")
-(setq org-mobile-inbox-for-pull "/sshx:calendar:/home/calendar/MobileOrg/refile.org")
+(setq org-mobile-directory "/sshx:calendar:/home/calendar/MobileOrg/")
+(setq org-mobile-inbox-for-pull "~/Notes/inbox.org")
 ;(setq org-mobile-directory "~/Dropbox/MobileOrg/")
-(setq org-mobile-inbox-for-pull "~/Notes/refile.org")
 (setq org-agenda-files '("~/Notes/gtd.org"
                          "~/Notes/tickler.org"
 			 "~/Notes/inbox.org"))
@@ -420,7 +280,7 @@ Turn on Auto Complete for Latex buffers and set up citation
 (setq org-pretty-entities t)
 (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
 (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
-(setq org-refile-use-outline-path t)                  ; Show full paths for refiling
+(setq org-refile-use-outline-path 'file)                  ; Show full paths for refiling
 #+END_SRC
 
 *** Time Clocking
@@ -438,7 +298,7 @@ Capture templates and other Fill in Stuff
                          '(("i" "Save a thought" entry (file "~/Notes/inbox.org")
 			        "* %?")
 			   ("n" "Save a NEXT action item" entry (file "~/Notes/inbox.org")
-                                "* NEXT %^G%?")))
+                                "* NEXT %? %^G")))
 			   
 #+END_SRC
 *** Blog
@@ -507,7 +367,7 @@ Manage programming projects in Emacs
     (add-hook 'lisp-mode-hook #'enable-paredit-mode)
     (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
     (add-hook 'scheme-mode-hook #'enable-paredit-mode)
-#END_SRC
+#+END_SRC
 *** C/C++ Development
 #+BEGIN_SRC emacs-lisp
 (setq c-default-style '((java-mode . "java")
@@ -573,18 +433,12 @@ Initialize yasnippets
 ;;        (global-set-key (kbd "C-c y") (lambda () (interactive)
 ;;                                         (yas/load-directory "~/elisp/snippets")))
 #+END_SRC
-** Multimedia
-*** EMMS
+*** Java
 #+BEGIN_SRC emacs-lisp
-
-(use-package emms
-   :ensure t
-   :config
-   (require 'emms-setup)
-   (emms-all)
-   (emms-default-players)
-   (setq emms-source-file-default-directory "~/Music/"))
+(setq jdee-server-dir "~/.emacs.d/jdee-jar")
 #+END_SRC
+
+** Multimedia
 ** Remote
 #+BEGIN_SRC emacs-lisp
 (setq ange-fpt-ftp-program-name "ncftp")
