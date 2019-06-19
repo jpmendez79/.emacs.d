@@ -44,22 +44,6 @@ Sets up Latitude and Longitude for Weather Reports and Sunrise/Sunset Settings
   :config (auto-compile-on-load-mode))
 (setq load-prefer-newer t)
 #+END_SRC
-*** Load Stuff
-Load through a seperate file, so I can VC this file more easily
-#+BEGIN_SRC emacs-lisp
-;(load ~/.emacs.secrets t)
-(setq gnus-init-file "~/.emacs.d/gnus.el")
-#+END_SRC
-*** Exwm
-#+BEGIN_SRC emacs-lisp
-(display-time-mode t)
-(require 'exwm)
-(require 'exwm-config)
-(require 'exwm-systemtray)
-(exwm-systemtray-enable)
-(exwm-config-default)
-;;(exwm-input-set-key (kdb "s-m") #'exwm-workspace-move-window)
-#+END_SRC
 ** General Configuration
 *** Backups
 Hide the Emacs Poo
@@ -69,122 +53,73 @@ Hide the Emacs Poo
 #+END_SRC
 *** Windows Configuration
 #+BEGIN_SRC emacs-lisp
-(require 'uniquify)
-(when window-system
-  (tooltip-mode -1)
-  (tool-bar-mode -1)
-  (menu-bar-mode 1)
-  (display-time-mode 1)
-  (column-number-mode 1)
-  (scroll-bar-mode -1))
-(require 'win-switch)
-(win-switch-setup-keys-ijkl "\C-xo")
+(server-start)
+(display-time-mode 1)
+(display-battery-mode 1)
+(require 'exwm)
+(require 'exwm-config)
+(exwm-config-default)
+(require 'exwm-systemtray)
+(exwm-systemtray-enable)
+(defun exwm-rename-buffer-to-title () (exwm-workspace-rename-buffer exwm-title))
+(add-hook 'exwm-update-title-hook 'exwm-rename-buffer-to-title)
+
 #+END_SRC
 *** Change Yes and No to Y and N
 Change this because I am a lazy bastard
 #+BEGIN_SRC emacs-lisp
 (fset 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
-*** Theme Settings
-#+BEGIN_SRC emacs-lisp
-(use-package moe-theme
-   :ensure t
-   :config 
-   (require 'moe-theme)
-   (require 'moe-theme-switcher))
-#+END_SRC
-*** Autocomplete and AutoPair
-#+BEGIN_SRC emacs-lisp
-(show-paren-mode t)
-(setq show-paren-style 'expression)
-(global-auto-complete-mode t)
-(autopair-global-mode)
-(show-paren-mode t)
-(setq-default highlight-tabs t)
-#+END_SRC
-*** Helm Mode
-#+BEGIN_SRC emacs-lisp
-(use-package helm
-  :ensure t
-  :diminish helm-mode
-  :init
-  (progn
-    (require 'helm-config)
-    (setq helm-candidate-number-limit 100)
-    ;; From https://gist.github.com/antifuchs/9238468
-    (setq helm-idle-delay 0.0 ; update fast sources immediately (doesn't).
-          helm-input-idle-delay 0.01  ; this actually updates things
-                                        ; reeeelatively quickly.
-          helm-yas-display-key-on-candidate t
-          helm-quick-update t
-          helm-M-x-requires-pattern nil
-          helm-ff-skip-boring-files t)
-    (helm-mode))
-  :bind (("C-c h" . helm-mini)
-         ("C-h a" . helm-apropos)
-         ("C-x C-b" . helm-buffers-list)
-         ("C-x b" . helm-buffers-list)
-         ("M-y" . helm-show-kill-ring)
-         ("M-x" . helm-M-x)
-         ("C-x c o" . helm-occur)
-         ("C-x c s" . helm-swoop)
-         ("C-x c y" . helm-yas-complete)
-         ("C-x c Y" . helm-yas-create-snippet-on-region)
-         ("C-x c b" . my/helm-do-grep-book-notes)
-         ("C-x c SPC" . helm-all-mark-rings)
-))
-(ido-mode -1) ;; Turn off ido mode in case I enabled it accidentall
-#+END_SRC
 *** Line Numbers
 I like Line Numbers
 #+BEGIN_SRC emacs-lisp
 (column-number-mode 1)
 #+END_SRC
-*** Setup BBDB
-#+BEGIN_SRC emacs-lisp
-(require 'bbdb)
-(setq bbdb-file "~/.emacs.d/bbdb")
-  ;; (setq bbdb-complete-name-full-completion t)
-  ;; (setq bbdb-completion-type 'primary-or-name)
-  ;; (setq bbdb-complete-name-allow-cycling t)
-  ;; (setq
-  ;; bbdb-offer-save 1
-  ;; bbdb-use-pop-up t
-  ;; bbdb-electric-p t
-  ;; bbdb-popup-target-lines  1
-  ;; )
-#+END_SRC
 *** MIME Stuff
 #+BEGIN_SRC emacs-lisp
 (setq browse-url-browser-function 'browse-url-firefox)
 #+END_SRC
-*** Multiple Cursers
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-c m c") 'mc/edit-lines)
-#+END_SRC
 *** Terminal stuff
 #+BEGIN_SRC emacs-lisp
 (require 'eshell)
-(require 'xterm-color)
-(add-hook 'eshell-mode-hook
-          (lambda () (progn
-            (setq xterm-color-preserve-properties t)
-            (setenv "TERM" "xterm-256color"))))
-(add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
 
 (setq eshell-output-filter-functions
     (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
-
-
-(progn (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter)
-       (setq comint-output-filter-functions (remove 'ansi-color-process-output comint-output-filter-functions)))
-
 (setq eshell-prompt-function (lambda nil
     (concat
      (propertize (eshell/pwd) 'face `(:foreground "blue"))
      (propertize "  λ " 'face `(:foreground "bold white")))))
   (setq eshell-highlight-prompt nil)
 (setq eshell-scroll-to-bottom-on-input t)
+  ;; (add-to-list 'eshell-visual-commands "dispatch-conf")
+  ;; (add-to-list 'eshell-visual-commands "alsamixer")
+;;(keychain-refresh-environment)
+#+END_SRC
+*** Inline images
+#+BEGIN_SRC emacs-lisp
+(autoload 'iimage-mode "iimage" "Support Inline image minor mode." t)
+(autoload 'turn-on-iimage-mode "iimage" "Turn on Inline image minor mode." t)
+#+END_SRC
+
+*** Address Book
+#+BEGIN_SRC emacs-lisp
+(setq vdirel-repository "~/.contacts.org")
+#+END_SRC
+*** Crypto
+#+BEGIN_SRC emacs-lisp
+(setq epa-pinentry-mode 'loopback)
+(pinentry-start)
+#+END_SRC
+*** Theme
+#+BEGIN_SRC emacs-lisp
+(use-package moe-theme
+   :ensure t
+   :config
+   (require 'moe-theme-switcher)
+   (show-paren-mode t)
+   (setq show-paren-style 'expression)
+)
+
 #+END_SRC
 ** Writing
 *** Appearence
@@ -197,29 +132,38 @@ Use Visual Line Mode so it reads nice, but doesn't mess with the actual file
 *** Spelling
 Set up Spell Checking
 #+BEGIN_SRC emacs-lisp
-;(setq ispell-program-name "aspell")
-;(setq ispell-personal-dictionary "~/.ispell")
-;(dolist (hook '(org-mode-hook))
- ;
-;     (add-hook hook (lambda () (flyspell-mode 1))))
- ;   (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
-  ;    (add-hook hook (lambda () (flyspell-mode -1))))
+  (use-package ispell
+     :config
+     ;; (add-hook 'LaTex-mode-hook 'flyspell-mode)
+     ;; (add-hook 'LaTeX-mode-hook 'flyspell-buffer)
+     (add-hook 'org-mode-hook 'flyspell-mode)
+     (add-hook 'message-mode 'flyspell-mode))
 #+END_SRC
 *** Latex
 Turn on Auto Complete for Latex buffers and set up citation
 #+BEGIN_SRC emacs-lisp
-(require 'auto-complete-auctex)
-(setq reftex-plug-into-AUCTeX t)
+  ;(require 'auto-complete-auctex)
+  ;; (setq reftex-plug-into-AUCTeX t)
+  ;;(pdf-tools-install) ;; start server
+(use-package pdf-tools
+  :magic ("%PDF" . pdf-view-mode)
+  :config
+  (pdf-tools-install :no-query))
+  (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+    TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view)))
+  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
 #+END_SRC
 ** Org
 #+BEGIN_SRC emacs-lisp
-(use-package org
+(use-package org-plus-contrib
    :ensure t
-)
-(require 'org)
-;(require 'org-page)
-;(require 'org-drill)
+   :config
+   (require 'org)
+   (require 'org-checklist)
+   (require 'org-contacts)
+   (require 'org-protocol)
 
+)
 #+END_SRC
 *** Keybindings
 #+BEGIN_SRC emacs-lisp
@@ -227,6 +171,8 @@ Turn on Auto Complete for Latex buffers and set up citation
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-c." 'org-time-stamp)
+(global-set-key (kbd "\C-cb") 'org-brain-visualize)
+(global-set-key "\C-cp" 'org-pomodoro)
 #+END_SRC
 *** Tags
 #+BEGIN_SRC emacs-lisp
@@ -242,79 +188,71 @@ Turn on Auto Complete for Latex buffers and set up citation
 *** Agendas
 #+BEGIN_SRC emacs-lisp
 (setq org-stuck-projects
-   '("+LEVEL=1+project/-SOMEDAY-DONE-WAITING" ("NEXT") nil "\\<IGNORE\\>"))
-(setq org-agenda-custom-commands
-   '(("W" "Weekly Review"
-     ((agenda "" ((org-agenda-ndays 7))) ;; review upcoming deadlines and appointments
-                                           ;; type "l" in the agenda to review logged items 
-          (stuck "") ;; review stuck projects as designated by org-stuck-projects
-          (tags "+LEVEL=1+project-someday") ;; review all projects (assuming you use todo keywords to designate projects)
-          (tags "+LEVEL=2+someday") ;; review someday/maybe items
-          (todo "WAITING"))) ;; review waiting items 
-         ("o" tags-todo "@office-someday")
-     ("p" tags-todo "phone-someday")
-     ("c" tags-todo "@campus-someday")
-     ("i" tags-todo "@internet-someday")
-     ("l" tags-todo "@laptop-someday")
-     ("m" tags-todo "mom-someday")
-     ("d" tags-todo "dad-someday")
-     ("g" tags-todo "gabi-someday")
-     ("h" tags-todo "@home-someday")
-     ("e" tags-todo "@errand-someday")
-     ("w" tags-todo "@anywhere-someday")
-        ))
+    '("+LEVEL=2+project-someday-hw/-SOMEDAY-DONE" ("NEXT" "WAITING") ))
+  (setq org-agenda-custom-commands
+     '(("W" "Weekly Review"
+       ((agenda "" ((org-agenda-ndays 7))) ;; review upcoming deadlines and appointments
+					     ;; type "l" in the agenda to review logged items 
+	    (stuck "") ;; review stuck projects as designated by org-stuck-projects
+	    (tags "+LEVEL=2+project-someday-hw") ;; review all projects (assuming you use todo keywords to designate projects)
+	    (tags "+LEVEL=1+someday") ;; review someday/maybe items
+	    (todo "WAITING"))) ;; review waiting items 
+	   ("o" tags-todo "@office-someday")
+       ("p" tags-todo "@phone-someday")
+       ("c" tags-todo "@campus-someday")
+       ("i" tags-todo "@internet-someday")
+       ("l" tags-todo "@laptop-someday")
+       ("m" tags-todo "mom-someday")
+       ("d" tags-todo "dad-someday")
+       ("g" tags-todo "gabi-someday")
+       ("h" tags-todo "@home-someday")
+       ("e" tags-todo "@errand-someday")
+       ("w" tags-todo "@anywhere-someday")
+	  ))
 #+END_SRC
 *** Org Mobile
 #+BEGIN_SRC emacs-lisp
-(setq org-mobile-directory "/sshx:calendar:/home/calendar/MobileOrg/")
-(setq org-mobile-inbox-for-pull "~/Notes/inbox.org")
-;(setq org-mobile-directory "~/Dropbox/MobileOrg/")
-(setq org-agenda-files '("~/Notes/gtd.org"
-                         "~/Notes/tickler.org"
-			 "~/Notes/inbox.org"))
+  ;; (setq org-mobile-directory "/sshx:calendar:/home/system/MobileOrg/")
+  ;; (setq org-mobile-inbox-for-pull "~/Notes/inbox.org")
+  (setq org-agenda-files '("~/Notes/org/gcal.org"))
+  ;; Push org files to org mobile when saved
+  ;; (defun org-mobile-push-hook ()
+  ;;   (when (equal major-mode 'org-mode)
+  ;;     (add-hook 'after-save-hook 'org-mobile-push)
+  ;;   )
+  ;; )
+
 #+END_SRC
 *** Note Taking 
 #+BEGIN_SRC emacs-lisp
 (setq org-directory "~/Notes")
-(setq org-default-notes-file "~/Notes/inbox.org")
+(setq org-default-notes-file "~/Notes/org/inbox.org")
 (setq org-pretty-entities t)
-(add-hook 'org-mode-hook 'turn-on-org-cdlatex)
+;(add-hook 'org-mode-hook 'turn-on-org-cdlatex)
 (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
 (setq org-refile-use-outline-path 'file)                  ; Show full paths for refiling
 #+END_SRC
 
 *** Time Clocking
 #+BEGIN_SRC emacs-lisp
-(setq org-clock-persist 'history)
 (org-clock-persistence-insinuate)
 #+END_SRC
 *** Templates
 Capture templates and other Fill in Stuff
 #+BEGIN_SRC emacs-lisp
-(setq org-refile-targets '(("~/Notes/gtd.org" :maxlevel . 3)
-                           ("~/Notes/someday.org" :level . 1)
-                           ("~/Notes/tickler.org" :maxlevel . 2)))
+(setq org-refile-targets '(("~/Notes/org/gtd.org" :maxlevel . 2)
+                           ("~/Notes/org/someday.org" :level . 1)))
 (setq org-capture-templates 
-                         '(("i" "Save a thought" entry (file "~/Notes/inbox.org")
+                         '(("i" "Save a thought" entry (file "~/Notes/org/inbox.org")
 			        "* %?")
-			   ("n" "Save a NEXT action item" entry (file "~/Notes/inbox.org")
-                                "* NEXT %? %^G")))
-			   
-#+END_SRC
-*** Blog
-#+BEGIN_SRC emacs-lisp
-(setq op/repository-directory "~/Projects/orgBlog")
-(setq op/site-domain "http://www.subject-matter.com/")
-#+END_SRC
-*** Babel
-#+BEGIN_SRC emacs-lisp
-;; active Org-babel languages
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '(;; other Babel languages
-   (plantuml . t)
-   (ledger . t)
-   (python . t)))
+			   ("a" "Appointment" entry (file  "~/Notes/gcal.org" )
+"* %?\n\n%^T\n\n:PROPERTIES:\n\n:END:\n\n")
+                           ("p" "Protocol" entry (file "~/Notes/org/inbox.org")
+        "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+	                   ("L" "Protocol Link" entry (file "~/Notes/org/inbox.org")
+        "* %? [[%:link][%:description]] \nCaptured On: %U")
+
+))
 #+END_SRC
 *** Encryption
 Setup Encrytption
@@ -328,46 +266,34 @@ Setup Encrytption
 (setq org-display-custom-times t)
 (setq org-time-stamp-custom-formats '("<%b %e, %Y>" . "<%b %e, %Y %H:%M>"))
 #+END_SRC
+*** Org Brain
+#+BEGIN_SRC emacs-lisp
+  (use-package org-brain 
+      :ensure t
+      :init
+      (setq org-brain-path "~/Notes/brain")
+      :config
+      (setq org-id-track-globally t)
+      (setq org-id-locations-file "~/.emacs.d/.org-id-locations")
+      (setq org-brain-visualize-default-choices 'all)
+      (setq org-brain-title-max-length 10))
+      (defun aa2u-buffer ()
+	 (aa2u (point-min) (point-max)))
+
+      (add-hook 'org-brain-after-visualize-hook #'aa2u-buffer)
+#+END_SRC
 *** Calendar
 #+BEGIN_SRC emacs-lisp
-;;(require 'org-gcal)
-                            
-
+(require 'org-gcal)
+(setq org-gcal-client-id "240464530285-vbhb9djmk27n0tg33j3i2etgpf1ro03d.apps.googleusercontent.com")
+(setq org-gcal-client-secret "oqg3oD4BpK51lmpVW4avJO8j")
+(setq org-gcal-file-alist '(("jessepmendez79@gmail.com" .  "~/Notes/gcal.org")
+                            ("aveneriotrejo@gmail.com" . "~/Notes/ana.org")))
 #+END_SRC
+(setq org-gcal-client-id "240464530285-nsdkfjqhsdnhnm021jt3g78lo9e0odi9.apps.googleusercontent.com"
+org-gcal-client-secret "u4Asg7c4h-VE7Moe0zu8X7L8"
 
 ** Programming
-*** Projectile
-Manage programming projects in Emacs
-#+BEGIN_SRC emacs-lisp
-(use-package projectile
-  :ensure t
-  :defer t
-  :diminish projectile-mode
-  :config
-  (projectile-global-mode)
-  ;(setq projectile-keymap-prefix (kbd "C-c p"))
-;  (setq projectile-completion-system 'default)
-;  (setq projectile-enable-caching t)
-  (setq projectile-indexing-method 'native)
-;  (add-to-list 'projectile-globally-ignored-files "node-modules")
-  :config
-)
-(use-package helm-projectile
-  :defer t 
-  :ensure t
-)
-#+END_SRC
-
-*** Emacs Lisp Development
-#+BEGIN_SRC emacs-lisp
-(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
-    (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
-    (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-    (add-hook 'ielm-mode-hook #'enable-paredit-mode)
-    (add-hook 'lisp-mode-hook #'enable-paredit-mode)
-    (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-    (add-hook 'scheme-mode-hook #'enable-paredit-mode)
-#+END_SRC
 *** C/C++ Development
 #+BEGIN_SRC emacs-lisp
 (setq c-default-style '((java-mode . "java")
@@ -382,65 +308,45 @@ Manage programming projects in Emacs
   (autopair-mode))
   
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
+(add-hook 'c-mode-common-hook 'flycheck-mode)
 #+END_SRC
-*** Python
-#+BEGIN_SRC emacs-lisp
-(use-package auto-virtualenv
-    :ensure t)
-(require 'auto-virtualenv)
-(defun my-python-mode-hook () 
-  (linum-mode 1)) 
-(add-hook 'python-mode-hook 'my-python-mode-hook) 
-;(add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
-;(add-hook 'python-mode-hook 'anaconda-mode)
-;(add-hook 'python-mode-hook 'anaconda-eldoc-mode)
-(elpy-enable )
-(setq python-shell-interpreter "python3")
-(with-eval-after-load 'python
-  (defun python-shell-completion-native-try ()
-    "Return non-nil if can trigger native completion."
-    (let ((python-shell-completion-native-enable t)
-          (python-shell-completion-native-output-timeout
-           python-shell-completion-native-try-output-timeout))
-      (python-shell-completion-native-get-completions
-       (get-buffer-process (current-buffer))
-       nil "_"))))
-;(setq python-shell-interpreter-args "--colors=Linux --profile=default")
-#+END_SRC
-*** Version Control
-Get a modeline icon for git
-#+BEGIN_SRC emacs-lisp
-(require 'git-emacs)
-#+END_SRC
-*** Snippets
-Initialize yasnippets
-#+BEGIN_SRC emacs-lisp
-
-(use-package yasnippet
-  :ensure t
-  :diminish yas-minor-mode
-  :init (yas-global-mode)
-  :config
-  (progn
-    (yas-global-mode)
-    (add-hook 'hippie-expand-try-functions-list 'yas-hippie-try-expand)
-    (setq yas-key-syntaxes '("w_" "w_." "^ "))
-    (setq yas-installed-snippets-dir "~/.emacs.d/yasnippet-snippets")
-    (setq yas-expand-only-for-last-commands nil)
-    (yas-global-mode 1)
-    (bind-key "\t" 'hippie-expand yas-minor-mode-map)
-    (add-to-list 'yas-prompt-functions 'shk-yas/helm-prompt)))
-;;        (global-set-key (kbd "C-c y") (lambda () (interactive)
-;;                                         (yas/load-directory "~/elisp/snippets")))
-#+END_SRC
-*** Java
-#+BEGIN_SRC emacs-lisp
-(setq jdee-server-dir "~/.emacs.d/jdee-jar")
-#+END_SRC
-
-** Multimedia
 ** Remote
 #+BEGIN_SRC emacs-lisp
 (setq ange-fpt-ftp-program-name "ncftp")
+#+END_SRC
+** Email
+#+BEGIN_SRC emacs-lisp
+  (require 'notmuch)
+  (require 'org-notmuch)
+  (setq notmuch-command "notmuch-remote")
+  (setq notmuch-fcc-dirs nil)
+  ;; Gnus Posting Alias
+  ;; (setq gnus-alias-identity-alist
+  ;;    '(("personal"
+  ;;    nil ;; Organization
+  ;;    nil ;; Headers
+  ;;    nil ;; Body Text
+  ;;    nil)))
+  ;; (setq gnus-alias-default-identity "personal")
+  ;;(add-hook 'message-setup-hook 'gnus-alias-determine-identity)
+  ;; Configuring outgoing smtp servers
+  (setq message-send-mail-function 'message-send-mail-with-sendmail)
+  (setq send-mail-function 'message-sendmail-with-sendmail)
+  (setq sendmail-program "/usr/bin/msmtp")
+  ;; This is needed to allow msmtp to do its magic:
+  (setq message-sendmail-f-is-evil 't)
+  (setq message-sendmail-extra-arguments '("--read-envelope-from"))
+  (setq gnus-permanently-visible-groups ".*")
+  (setq gnus-thread-sort-functions
+	'(gnus-thread-sort-by-most-recent-date))
+  (setq message-sendmail-envelope-from "header")
+
+  (define-key notmuch-show-mode-map "D"
+      (lambda ()
+      "mark message as deleted"
+      (interactive)
+  (notmuch-show-tag (list "+deleted" "-inbox"))))
+  (setq notmuch-multipart/alternative-discouraged '("text/plain" "text/html"))
+  (add-hook 'message-setup-hook 'mml-secure-message-sign-pgpmime)
 #+END_SRC
 

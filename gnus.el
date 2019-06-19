@@ -22,17 +22,11 @@
 (setq message-sendmail-envelope-from "header")
 
 ;; Might be able to do this with eww
-(setq mm-text-html-renderer 'w3m)
-(setq mm-inline-text-html-with-images t)
-(setq mm-inline-text-html-with-w3m-keymap nil)
-(setq mail-user-agent 'message-user-agent)
-(setq message-send-mail-function 'message-send-mail-with-sendmail)
-
-(require 'gnus-desktop-notify)
-(setq gnus-desktop-notify-function 'gnus-desktop-notify-exec
-      gnus-desktop-notify-exec-program "notify-send -a Emacs")
-(gnus-desktop-notify-mode)
-;(gnus-demon-add-scanmail)
+;; (setq mm-text-html-renderer 'shr)
+;; (setq mm-inline-text-html-with-images t)
+;; (setq mm-inline-text-html-with-w3m-keymap nil)
+;; (setq mail-user-agent 'message-user-agent)
+;; (setq message-send-mail-function 'message-send-mail-with-sendmail)
 
 (defun gnus-loop-from ()
   (interactive)
@@ -46,6 +40,11 @@
    (setq gnus-from-selected-index (+ gnus-from-selected-index 1)))
 
    (global-set-key (kbd "C-c f") 'gnus-loop-from)
+(setq gnus-posting-styles
+      '(((header "to" "jessepmendez79@gmail.com")
+         (address "jessepmendez79@gmail.com"))
+	(header "to" "jesse_mendez@elcamino.edu")
+	(address "jesse_mendez@elcamino.edu")))
 
 (provide '.gnus)
 ;;; .gnus ends here
