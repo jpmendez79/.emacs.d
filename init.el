@@ -7,36 +7,21 @@
 (setq use-package-verbose t)
 (require 'use-package)
 (setq load-prefer-newer t)
+(require 'notifications)
+(setq alert-default-style 'notifier)
+;; OS Specific Stuff
 (add-to-list 'load-path "/usr/share/emacs/site-lisp/pdf-tools/")
+;; Browser Settings
+(setq browse-url-browser-function 'browse-url-generic
+      browse-url-generic-program "/usr/bin/firefox-bin")
+(setq org-plantuml-executable-path "/usr/bin/plantuml")
+
 ;; Defun Section
 (defun my-org-hook ()
   (flyspell-mode 1)
   (org-fragtog-mode 1)
+  (auto-fill-mode 1)
   )
-
-(defun efs/run-in-background (command)
-  (let ((command-parts (split-string command "[ ]+")))
-    (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
-
-(defun efs/exwm-init-hook ()
-  ;; Make workspace 1 be the one where we land at startup
-  (exwm-workspace-switch-create 1)
-  (setq exwm-workspace-display-echo-area-timeout 3)
-  ;; Launch apps that will run in the background
-  (efs/run-in-background "pasystray")
-  (efs/run-in-background "blueberry-tray")
-  (efs/run-in-background "davmail")
-  (efs/run-in-background "slack -u")
-  (efs/run-in-background "wpa_gui -t"))
-
-(defun efs/exwm-update-class ()
-  (exwm-workspace-rename-buffer exwm-class-name))
-
-;; (defun pinentry-emacs (desc prompt ok error)
-;;   (let ((str (read-passwd
-;; 	      (concat (replace-regexp-in-string "%22" "\""
-;; 						(replace-regexp-in-string "%0A" "\n" desc)) prompt ": "))))
-;;     str))
 
 (defun my-ledger-hook ()
   (setq-local tab-always-indent 'complete)
@@ -69,90 +54,34 @@
 ;; Major mode Hooks
 (add-hook 'after-init-hook 'global-company-mode)
 
-;; Personal Info and PIM Settings
-(setq user-full-name "Jesse Mendez"
-      user-mail-address "jmend46@lsu.edu")
-(setq compose-mail-user-agent-warnings nil)
-(setq send-mail-function 'sendmail-send-it
-      sendmail-program "/usr/bin/msmtp"
-      mail-specify-envelope-from t
-      message-sendmail-envelope-from 'header
-      mail-envelope-from 'header)
-(setq message-send-mail-function 'message-send-mail-with-sendmail)
-
-
 ;; Setup EBDB for contacts
-(require 'ebdb-wl)
+(setq ebdb-sources "~/Dropbox/org/ebdb")
 (require 'ebdb-message)
+(require 'ebdb-roam)
+(require 'ebdb-gnus)
+(require 'ebdb-org)
 (setq ebdb-mua-auto-update-p 'query)
 (setq ebdb-gnus-auto-update-p 'query)
 (setq edbd-default-window-size 0.2)
 
-;; ;; Wanderlust Email
-;; (use-package wl
-;;   :config
-;; )
 
-;; Mu4e
-(require 'mu4e)
 
-(setq mu4e-contexts
-      `(,(make-mu4e-context
-          :name "Personal"
-	  :enter-func (lambda () (mu4e-message "Entering Personal context"))
-          :leave-func (lambda () (mu4e-message "Leaving Personal context"))
-          :match-func (lambda (msg)
-			(when msg
-			  (string-match-p "^/personal" (mu4e-message-field msg :maildir))))
-	  :vars '(
-                  (user-full-name . "Jesse Mendez")
-                  (user-mail-address . "jessepmendez79@gmail.com")
-                  (mu4e-compose-signature . (concat
-                                             "Jesse Mendez"))
-		  (mu4e-drafts-folder . "/personal/\[Gmail\]/Drafts")
-		  (mu4e-sent-folder . "/personal/\[Gmail\]/Sent Mail")
-		  (mu4e-trash-folder . "/personal/\[Gmail\]/Trash")
-		  (smtpmail-smtp-server  . "smtp.gmail.com")
-                  (smtpmail-smtp-service . 465)
-                  (smtpmail-stream-type  . ssl)
-		  ))
-	,(make-mu4e-context
-          :name "Louisiana State University"
-          :match-func (lambda (msg)
-			(when msg
-			  (string-match-p "^/lsu" (mu4e-message-field msg :maildir))))
-	  :enter-func (lambda () (mu4e-message "Entering LSU context"))
-          :leave-func (lambda () (mu4e-message "Leaving LSU context"))
-          :vars '(
-                  (user-full-name . "Jesse Mendez")
-                  (user-mail-address . "jmend46@lsu.edu")
-                  (mu4e-compose-signature . (concat
-                                             "Jesse Mendez"))
-                  (mu4e-sent-folder . "/lsu/Sent")
-                  (mu4e-drafts-folder . "/lsu/Drafts")
-                  (mu4e-trash-folder .  "/lsu/Trash")
-                  (mu4e-refile-folder . "/lsu/Archive")
-		  (smtpmail-smtp-server  . "127.0.0.1")
-                  (smtpmail-smtp-service . 1025)
-                  (smtpmail-stream-type  . plain)
+;; Calendar Settings
+(require 'calfw)
 
-                  ;; (mu4e-maildir-shortcuts . (("/INBOX" . ?i)
-                  ;;                            ("/Archive" . ?a)
-                  ;;                            ("/Sent" . ?s)
-                  ;;                            ("/Trash" . ?t)
-		  ;; 			     ("/Junk" . ?j)))
-		  ))
-	))
-(setq mu4e-change-filenames-when-moving t)
-(setq mu4e-context-policy 'pick-first)
-(setq message-send-mail-function 'smtpmail-send-it)
-(setq mu4e-update-interval (* 10 60))
-(setq mu4e-get-mail-command "mbsync -a")
-;; don't save messages to Sent Messages, Gmail/IMAP takes care of this
-(setq mu4e-sent-messages-behavior 'delete)
-;; location Settings 
+(use-package calfw-org
+  :ensure t
+  ;; :bind
+  ;; ("M-<f3>" . cfw:open-org-calendar)
+  :config
+  ;; hotfix: incorrect time range display
+  ;; source: https://github.com/zemaye/emacs-calfw/commit/3d17649c545423d919fd3bb9de2efe6dfff210fe
+)
 (setq calendar-latitude 30.4)
 (setq calendar-longitude -91.18)
+(setq holiday-bahai-holidays nil)
+(setq holiday-hebrew-holidays nil)
+(setq holiday-islamic-holidays nil)
 
 ;; Save File
 (setq delete-old-versions t)
@@ -193,9 +122,6 @@
   (require 'pdf-occur)
   (pdf-tools-install :no-query))
 
-;; Browser Settings
-(setq browse-url-browser-function 'browse-url-generic
-      browse-url-generic-program "/usr/bin/firefox-bin")
 
 ;; Nov.el File associations
 (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
@@ -215,6 +141,7 @@
    'org-babel-load-languages
    '((ditaa . t)
      (python . t)
+     (plantuml . t)
      ))
   :hook (org-mode . my-org-hook)
   :custom
@@ -237,7 +164,7 @@
      ("c" "Computer" tags-todo "@computer-someday|@laptop-someday")
      ("e" "Errands" tags-todo "@errand-someday")
      ("p" "Phone" tags-todo "@phone-someday")
-     ("i" "Internet" tags-todo "@internet-someday")
+     ("o" "Internet" tags-todo "@online-someday")
      ("h" "Home" tags-todo "@home-someday")
      ("l" "LSU Campus" tags-todo "@campus-someday")
      ("W" "Weekly Review"
@@ -245,8 +172,8 @@
        (tags "inbox")
        (tags-todo "-someday-inbox")					  ; type "l" in the agenda to review logged items
        (stuck "") ; review stuck projects as designated by org-stuck-projects
-       (tags "Project-someday+LEVEL=2") ; review all projects (assuming you use todo keywords to designate projects)
-       (todo "WAITING")
+       (tags "Project-someday+LEVEL=1") ; review all projects (assuming you use todo keywords to designate projects)
+       (tags-todo "-someday+TODO=\"WAITING\"")
 
        (tags "someday+LEVEL=2")))))) ; review waiting items
 ;; ...other commands here
@@ -254,11 +181,13 @@
 
 (setq org-refile-targets '((nil :maxlevel . 9)
 			   (org-agenda-files :maxlevel . 9)
-			   ("/home/random/Dropbox/org/someday.org" :level . 2)
-			   ("/home/random/Dropbox/org/gtd.org" :level . 2)
-			   ("/home/random/Dropbox/org/project.org" :maxlevel . 1)))
+			   ("~/Dropbox/org/someday.org" :level . 2)
+			   ("~/Dropbox/org/gtd.org" :level . 2)
+			   ("~/Dropbox/org/project.org" :maxlevel . 1)))
 (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
 (setq org-refile-use-outline-path 'file)                  ; Show full paths for refiling
+(setq org-plantuml-exec-mode 'plantuml)
+
 
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-cc" 'org-capture)
@@ -266,6 +195,7 @@
 (global-set-key "\C-c." 'org-time-stamp)
 (global-set-key "\C-cp" 'org-pomodoro)
 (global-set-key "\C-co" 'org-noter)
+(global-set-key "\C-cu" 'org-reset-checkbox-state-subtree)
 (setq org-tags-exclude-from-inheritance "project")
 
 (setq org-todo-keywords
@@ -442,78 +372,6 @@
 (use-package ledger-mode
   :hook (ledger-mode . my-ledger-hook)
   )
-
-;; EXWM Settings
-(use-package exwm
-  :ensure t
-  :config
-  ;; Set the default number of workspaces
-  (setq exwm-workspace-number 5)
-
-  ;; When window "class" updates, use it to set the buffer name
-  (add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
-
-  ;; When EXWM starts up, do some extra confifuration
-  (add-hook 'exwm-init-hook #'efs/exwm-init-hook)
-
-  (require 'exwm-randr)
-  (exwm-randr-enable)
-
-  ;; Load the system tray before exwm-init
-  (require 'exwm-systemtray)
-  (setq exwm-systemtray-height 22)
-  (exwm-systemtray-enable)
-
-  ;; These keys should always pass through to Emacs
-  (setq exwm-input-prefix-keys
-	'(?\C-x
-	  ?\C-u
-	  ?\C-h
-	  ?\M-x
-	  ?\M-`
-	  ?\M-&
-	  ?\M-:
-	  ?\C-\M-j  ;; Buffer list
-	  ?\C-\ ))  ;; Ctrl+Space
-
-  ;; Ctrl+Q will enable the next key to be sent directly
-  (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
-
-  ;; Set up global key bindings.  These always work, no matter the input state!
-  ;; Keep in mind that changing this list after EXWM initializes has no effect.
-  (setq exwm-input-global-keys
-	`(
-	  ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
-	  ([?\s-r] . exwm-reset)
-
-	  ;; Move between windows
-	  ([s-left] . windmove-left)
-	  ([s-right] . windmove-right)
-	  ([s-up] . windmove-up)
-	  ([s-down] . windpmove-down)
-
-	  ;; Launch applications via shell command
-	  ([?\s-&] . (lambda (command)
-		       (interactive (list (read-shell-command "$ ")))
-		       (start-process-shell-command command nil command)))
-	  ;; Switch workspace
-	  ([?\s-w] . exwm-workspace-switch)
-	  ([?\s-`] . (lambda () (interactive) (exwm-workspace-switch-create 0)))
-	  ([?\s-m] . exwm-workspace-move-window)
-	  ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
-	  ,@(mapcar (lambda (i)
-		      `(,(kbd (format "s-%d" i)) .
-			(lambda ()
-			  (interactive)
-			  (exwm-workspace-switch-create ,i))))
-		    (number-sequence 0 9))))
-
-  (require 'ido)
-  (ido-mode 1)
-  ;; let's get encryption established
-  (require 'epg)
-  (setq epg-pinentry-mode 'loopback)
-  (exwm-enable))
 (server-start)
 
 (custom-set-variables
@@ -523,6 +381,75 @@
  ;; If there is more than one, they won't work right.
  '(TeX-command-extra-options " -shell-escape ")
  '(auth-source-save-behavior nil)
+ '(calendar-holidays
+   '((holiday-fixed 1 1 "New Year's Day")
+     (holiday-float 1 1 3 "Martin Luther King Day")
+     (holiday-fixed 2 2 "Groundhog Day")
+     (holiday-fixed 2 14 "Valentine's Day")
+     (holiday-float 2 1 3 "President's Day")
+     (holiday-fixed 3 17 "St. Patrick's Day")
+     (holiday-fixed 4 1 "April Fools' Day")
+     (holiday-float 5 0 2 "Mother's Day")
+     (holiday-float 5 1 -1 "Memorial Day")
+     (holiday-fixed 6 14 "Flag Day")
+     (holiday-float 6 0 3 "Father's Day")
+     (holiday-fixed 7 4 "Independence Day")
+     (holiday-float 9 1 1 "Labor Day")
+     (holiday-float 10 1 2 "Columbus Day")
+     (holiday-fixed 10 31 "Halloween")
+     (holiday-fixed 11 11 "Veteran's Day")
+     (holiday-float 11 4 4 "Thanksgiving")
+     (holiday-easter-etc)
+     (holiday-fixed 12 25 "Christmas")
+     (if calendar-christian-all-holidays-flag
+	 (append
+	  (holiday-fixed 1 6 "Epiphany")
+	  (holiday-julian 12 25 "Christmas (Julian calendar)")
+	  (holiday-greek-orthodox-easter)
+	  (holiday-fixed 8 15 "Assumption")
+	  (holiday-advent 0 "Advent")))
+     (if calendar-hebrew-all-holidays-flag
+	 (append
+	  (holiday-hebrew-tisha-b-av)
+	  (holiday-hebrew-misc)))
+     (holiday-islamic-new-year)
+     (holiday-islamic 9 1 "Ramadan Begins")
+     (if calendar-islamic-all-holidays-flag
+	 (append
+	  (holiday-islamic 1 10 "Ashura")
+	  (holiday-islamic 3 12 "Mulad-al-Nabi")
+	  (holiday-islamic 7 26 "Shab-e-Mi'raj")
+	  (holiday-islamic 8 15 "Shab-e-Bara't")
+	  (holiday-islamic 9 27 "Shab-e Qadr")
+	  (holiday-islamic 10 1 "Id-al-Fitr")
+	  (holiday-islamic 12 10 "Id-al-Adha")))
+     (if calendar-bahai-all-holidays-flag
+	 (append
+	  (holiday-fixed 11 26 "Day of the Covenant")
+	  (holiday-fixed 11 28 "Ascension of `Abdu’l-Bahá")))
+     (holiday-chinese-new-year)
+     (if calendar-chinese-all-holidays-flag
+	 (append
+	  (holiday-chinese 1 15 "Lantern Festival")
+	  (holiday-chinese-qingming)
+	  (holiday-chinese 5 5 "Dragon Boat Festival")
+	  (holiday-chinese 7 7 "Double Seventh Festival")
+	  (holiday-chinese 8 15 "Mid-Autumn Festival")
+	  (holiday-chinese 9 9 "Double Ninth Festival")
+	  (holiday-chinese-winter-solstice)))
+     (solar-equinoxes-solstices)
+     (holiday-sexp calendar-daylight-savings-starts
+		   (format "Daylight Saving Time Begins %s"
+			   (solar-time-string
+			    (/ calendar-daylight-savings-starts-time
+			       (float 60))
+			    calendar-standard-time-zone-name)))
+     (holiday-sexp calendar-daylight-savings-ends
+		   (format "Daylight Saving Time Ends %s"
+			   (solar-time-string
+			    (/ calendar-daylight-savings-ends-time
+			       (float 60))
+			    calendar-daylight-time-zone-name)))))
  '(connection-local-criteria-alist
    '(((:machine
        #("mercury" 0 7
@@ -630,17 +557,19 @@
 	    0)
 	   " # " " λ "))))
  '(eshell-prompt-regexp "^[^#λ\12]* [#λ] ")
+ '(gnus-cloud-method "nnimap:Personal")
  '(newsticker-url-list
    '(("The Advocate Baton Rouge News" "https://morss.it/theadvocate.com/search/?q=&t=article&l=35&d=&d1=&d2=&s=start_time&sd=desc&c%5b%5d=baton_rouge/news*,baton_rouge/opinion*,baton_rouge/sports*,new_orleans/sports/saints&nk=%23tncen&f=rss" nil nil nil)))
  '(org-agenda-files
-   '("~/Dropbox/org/cal_calendar.org" "/home/random/Dropbox/org/project.org" "/home/random/Dropbox/org/cal_school.org" "/home/random/Dropbox/org/inbox.org" "/home/random/Dropbox/org/classes.org" "/home/random/Dropbox/org/someday.org" "/home/random/Dropbox/org/gtd.org" "/home/random/Dropbox/org/cal_personal.org"))
+   '("/home/random/Dropbox/org/cal_personal.org" "/home/random/Dropbox/org/sample_production.org" "/home/random/Dropbox/org/cal_calendar.org" "/home/random/Dropbox/org/project.org" "/home/random/Dropbox/org/cal_school.org" "/home/random/Dropbox/org/inbox.org" "/home/random/Dropbox/org/classes.org" "/home/random/Dropbox/org/someday.org" "/home/random/Dropbox/org/gtd.org"))
  '(org-modules
    '(ol-bbdb ol-bibtex ol-docview ol-doi ol-eww ol-gnus org-id ol-info ol-irc ol-mhe ol-rmail ol-w3m ol-wl))
  '(org-stuck-projects
    '("+Project-someday+LEVEL=1/-DONE-CANCELED-someday"
      ("NEXT" "WAITING")))
  '(package-selected-packages
-   '(org-ql cern-root-mode biblio-core bibtex-completion helm-bibtex khoj dired-hide-dotfiles org-drill rainbow-delimiters company wanderlust 0blayout multiple-cursors transient org-contrib org-roam-ui djvu org-roam org-roam-bibtex kaolin-themes ebdb auctex ledger-mode org-fragtog vdirel pass oauth2-request simple-httpd laas yasnippet-snippets vterm pyvenv python-mode csv-mode circadian spacemacs-theme xterm-color exwm org-pomodoro magit org-ref org-noter smtpmail-multi arduino-mode flycheck oauth oauth2 async use-package org-plus-contrib)))
+   '(eat password-store org-contacts bbdb gnus-desktop-notify org-roam-ui helm helm-bibtex org-roam org-roam-bibtex slack dash calfw calfw-org f helm-core magit-section nov org-ql cern-root-mode biblio-core bibtex-completion dired-hide-dotfiles org-drill rainbow-delimiters company 0blayout multiple-cursors transient org-contrib djvu kaolin-themes ebdb auctex ledger-mode org-fragtog pass oauth2-request simple-httpd laas yasnippet-snippets vterm pyvenv python-mode csv-mode circadian spacemacs-theme xterm-color exwm org-pomodoro magit org-ref org-noter smtpmail-multi arduino-mode flycheck oauth oauth2 async use-package org-plus-contrib))
+ '(printer-name "Grad"))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
