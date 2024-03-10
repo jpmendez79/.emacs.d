@@ -174,14 +174,16 @@
        (tags "someday+LEVEL=2")))))) ; review waiting items
 ;; ...other commands here
 ;; (1) (2) (3) (4)
-(setq org-agenda-files '("~/Dropbox/org/inbox.org" "~/Dropbox/org/someday.org" "~/Dropbox/org/project.org" "~/Dropbox/org/gtd.org"))
-)
+(setq org-agenda-files '("~/Dropbox/org/inbox.org"
+			 "~/Dropbox/org/project.org"
+			 "~/Dropbox/org/gtd.org"
+			 "~/Dropbox/org/cal_calendar.org"))
+
 (setq org-refile-targets '((nil :maxlevel . 9)
-			   (org-agenda-files :maxlevel . 9)
 			   ("~/Dropbox/org/someday.org" :level . 2)
-			   ("~/Dropbox/org/gtd.org" :level . 2)
+			   ("~/Dropbox/org/gtd.org" :level . 3)
 			   ("~/Dropbox/org/project.org" :maxlevel . 1)
-			   ("~/Dropbox/org/cal_calendar.org")))
+			   ("~/Dropbox/org/cal_calendar.org" :maxlevel . 3)))
 (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
 (setq org-refile-use-outline-path 'file)
 (setq org-refile-allow-creating-parent-nodes t)					; Show full paths for refiling
