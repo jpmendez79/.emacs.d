@@ -68,7 +68,6 @@
 
 ;; Calendar Settings
 (require 'calfw)
-
 (use-package calfw-org
   :ensure t
   ;; :bind
