@@ -95,6 +95,11 @@
 (setq holiday-hebrew-holidays nil)
 (setq holiday-islamic-holidays nil)
 
+(use-package hyperbole
+  :config
+  (setq hbmap:dir-user "~/Dropbox/hyperb/")
+  (setq hyrolo-file-list '("~/Dropbox/hyperb/rolo.org"))
+  (setq hyrolo-date-format "%Y-%m-%d %H:%M:%S"))
 ;; Tex and Latex Settings
 (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
       TeX-source-correlate-start-server t)
@@ -162,7 +167,9 @@
      ("o" "Internet" tags-todo "@online-someday")
      ("h" "Home" tags-todo "@home-someday")
      ("l" "LSU Campus" tags-todo "@campus-someday")
-     ("b" "BNL Onsite" tags-todo "@bnl-someday")
+     ("r" "LArASIC Lab" tags-todo "@larasic-someday")
+     ("m" "Personal Computer mercury" tags-todo "@mercury-someday")
+     ("b" "Work Computer bortan" tags-todo "@bortan-someday")
      ("W" "Weekly Review"
       ((agenda "" ((org-agenda-span 7))); review upcoming deadlines and appointments
        (tags "inbox")
@@ -180,13 +187,12 @@
 			 "~/Dropbox/org/cal_calendar.org"))
 
 (setq org-refile-targets '((nil :maxlevel . 9)
-			   ("~/Dropbox/org/someday.org" :level . 2)
-			   ("~/Dropbox/org/gtd.org" :level . 3)
-			   ("~/Dropbox/org/project.org" :maxlevel . 1)
-			   ("~/Dropbox/org/cal_calendar.org" :maxlevel . 3)))
-(setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
+			   ("~/Dropbox/org/someday.org" :maxlevel . 9)
+			   ("~/Dropbox/org/gtd.org" :maxlevel . 3)
+			   ("~/Dropbox/org/project.org" :maxlevel . 9)
+			   ("~/Dropbox/org/cal_calendar.org" :maxlevel . 9)))
 (setq org-refile-use-outline-path 'file)
-(setq org-refile-allow-creating-parent-nodes t)					; Show full paths for refiling
+;; (setq org-refile-allow-creating-parent-nodes t)					; Show full paths for refiling
 (setq org-plantuml-exec-mode 'plantuml)
 (setq org-plantuml-executable-path "/usr/bin/plantuml")
 
@@ -455,7 +461,7 @@
 			    calendar-daylight-time-zone-name)))))
  '(ebdb-sources "~/Dropbox/org/ebdb")
  '(package-selected-packages
-   '(eat vterm org-noter ebdb org-roam-bibtex pdf-tools alert-toast gnus-desktop-notify company auctex magit org-fragtog use-package org-roam helm-bibtex eglot calfw-org calfw)))
+   '(hyperbole eat vterm org-noter ebdb org-roam-bibtex pdf-tools alert-toast gnus-desktop-notify company auctex magit org-fragtog use-package org-roam helm-bibtex eglot calfw-org calfw)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
