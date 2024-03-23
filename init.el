@@ -313,7 +313,20 @@
 (use-package org-noter
   :ensure t
   )
-
+(use-package deft
+  :config
+  (setq deft-directory "~/Dropbox/org")
+  (setq deft-extensions '("org"))
+  (setq deft-recursive t)
+  (setq deft-use-filename-as-title t)
+  (setq deft-use-filter-string-for-filename t)
+  (setq deft-file-naming-rules '((noslash . "-")
+                                 (nospace . "-")
+                                 (case-fn . downcase)))
+  (setq deft-text-mode 'org-mode)
+  (global-set-key (kbd "C-c d") 'deft)
+  (global-set-key (kbd "C-x C-g") 'deft-find-file)
+  )
 (require 'ox-beamer)
 (require 'ox-latex)
 (setq org-export-allow-bind-keywords t)
@@ -544,8 +557,9 @@
       (path-separator . ":")
       (null-device . "/dev/null"))))
  '(ebdb-sources "~/Dropbox/org/ebdb")
+ '(org-fold-core-style 'overlays)
  '(package-selected-packages
-   '(hyperbole eat vterm org-noter ebdb org-roam-bibtex pdf-tools alert-toast gnus-desktop-notify company auctex magit org-fragtog use-package org-roam helm-bibtex eglot calfw-org calfw)))
+   '(deft hyperbole eat vterm org-noter ebdb org-roam-bibtex pdf-tools alert-toast gnus-desktop-notify company auctex magit org-fragtog use-package org-roam helm-bibtex eglot calfw-org calfw)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
