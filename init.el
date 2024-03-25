@@ -75,7 +75,6 @@
 ;; Setup EBDB for contacts
 (setq ebdb-sources "~/Dropbox/org/ebdb")
 (require 'ebdb-message)
-(require 'ebdb-roam)
 (require 'ebdb-gnus)
 (require 'ebdb-org)
 (setq ebdb-mua-auto-update-p 'query)
@@ -100,11 +99,6 @@
 (setq holiday-hebrew-holidays nil)
 (setq holiday-islamic-holidays nil)
 
-(use-package hyperbole
-  :config
-  (setq hbmap:dir-user "~/Dropbox/hyperb/")
-  (setq hyrolo-file-list '("~/Dropbox/hyperb/rolo.org"))
-  (setq hyrolo-date-format "%Y-%m-%d %H:%M:%S"))
 ;; Tex and Latex Settings
 (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
       TeX-source-correlate-start-server t)
@@ -153,7 +147,7 @@
   (org-capture-templates
    '(
      ("a" "Capture an Appointment")
-     ("ap" "Personal Calendar Appointment" entry (file  "~/Dropbox/org/cal_personal.org" )
+     ("ap" "Personal Calendar Appointment" entry (file  "~/Dropbox/org/cal_calendar.org" )
       "* %?\n\n:PROPERTIES:\n\n:END:\n\n")
      ("as" "School Calendar Appointment" entry (file  "~/Dropbox/org/cal_school.org" )
       "* %?\n\n:PROPERTIES:\n\n:END:\n\n")
@@ -170,6 +164,7 @@
      ("r" "LArASIC Lab" tags-todo "@larasic-someday")
      ("m" "Personal Computer mercury" tags-todo "@mercury-someday")
      ("b" "Work Computer bortan" tags-todo "@bortan-someday")
+     ("g" "Agendas" tags-todo "@agenda-someday")
      ("W" "Weekly Review"
       ((agenda "" ((org-agenda-span 7))); review upcoming deadlines and appointments
        (tags "inbox")
@@ -215,55 +210,6 @@
 (org-crypt-use-before-save-magic)
 (setq org-tags-exclude-from-inheritance (quote ("crypt")))
 
-(use-package org-roam
-  :ensure t
-  :init
-  (setq org-roam-v2-ack t)
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-	 ("C-c n f" . org-roam-node-find)
-	 ("C-c n i" . org-roam-node-insert))
-  :custom
-  (org-roam-directory "~/Dropbox/org")
-  (org-roam-node-display-template
-   (concat "${title:*} "
-           (propertize "${tags:50}" 'face 'org-tag)))
-
-  (org-roam-capture-templates
-   '(("m" "main" plain
-      "%?"
-      :if-new (file+head "${slug}.org"
-			 "#+title: ${title}\n")
-      :immediate-finish t
-      :unnarrowed t)
-     ("r" "reference" plain "%?"
-      :if-new
-      (file+head "${title}.org" "#+title: ${title}\n")
-      :immediate-finish t
-      :unnarrowed t)
-     ("b" "bibliography reference" plain
-      (file "~/Dropbox/org/bib-roam-template.org")
-      :target
-      (file+head "reference/${citekey}.org" "#+title: ${title}\n"))
-     ("a" "article" plain "%?"
-      :if-new
-      (file+head "articles/${title}.org" "#+title: ${title}\n#+filetags: :articlpe:\n")
-      :immediate-finish t
-      :unnarrowed t)))
-  :config
-  (org-roam-setup)
-  (org-roam-bibtex-mode +1)
-  )
-
-(use-package org-roam-bibtex
-  :after (org-roam)
-  :bind (:map org-mode-map ("C-c n b" . orb-note-actions))
-  :config
-  ;; (setq orb-note-actions-interface 'hydra)
-  (setq orb-preformat-keywords
-        '("citekey" "title" "url" "author-or-editor" "keywords" "file" "date")
-        orb-process-file-keyword t
-        orb-insert-interface 'helm-bibtex 
-        orb-file-field-extensions '("pdf")))
 
 (use-package helm-bibtex
   :ensure t
@@ -559,7 +505,7 @@
  '(ebdb-sources "~/Dropbox/org/ebdb")
  '(org-fold-core-style 'overlays)
  '(package-selected-packages
-   '(deft hyperbole eat vterm org-noter ebdb org-roam-bibtex pdf-tools alert-toast gnus-desktop-notify company auctex magit org-fragtog use-package org-roam helm-bibtex eglot calfw-org calfw)))
+   '(deft eat org-noter ebdb pdf-tools alert-toast gnus-desktop-notify company auctex magit org-fragtog use-package helm-bibtex eglot calfw-org calfw)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
