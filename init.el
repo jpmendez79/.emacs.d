@@ -260,20 +260,11 @@
 (use-package org-noter
   :ensure t
   )
-(use-package deft
-  :config
-  (setq deft-directory "~/Dropbox/org")
-  (setq deft-extensions '("org"))
-  (setq deft-default-extension "org")
-  (setq deft-recursive t)
-  (setq deft-use-filename-as-title t)
-  (setq deft-use-filter-string-for-filename t)
-  (setq deft-file-naming-rules '((noslash . "-")
-                                 (nospace . "-")
-                                 (case-fn . downcase)))
-  (setq deft-text-mode 'org-mode)
-  (global-set-key (kbd "C-c d") 'deft)
-  (global-set-key (kbd "C-x C-g") 'deft-find-file)
+
+(use-package denote
+  :ensure t
+  :custom
+  (denote-directory "~/Dropbox/denote")
   )
 (require 'ox-beamer)
 (require 'ox-latex)
@@ -552,7 +543,7 @@
    '("/mnt/c/Users/jesse/Dropbox/org/research.org" "/home/jmendez/Dropbox/org/inbox.org" "/home/jmendez/Dropbox/org/project.org" "/home/jmendez/Dropbox/org/gtd.org" "/home/jmendez/Dropbox/org/cal_calendar.org"))
  '(org-fold-core-style 'overlays)
  '(package-selected-packages
-   '(org-cliplink org-gcal slack deft eat org-noter ebdb pdf-tools alert-toast gnus-desktop-notify company auctex magit org-fragtog use-package helm-bibtex eglot calfw-org calfw)))
+   '(denote org-cliplink org-gcal slack deft eat org-noter ebdb pdf-tools alert-toast gnus-desktop-notify company auctex magit org-fragtog use-package helm-bibtex eglot calfw-org calfw)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
