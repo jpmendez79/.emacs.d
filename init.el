@@ -265,6 +265,17 @@
   :ensure t
   :custom
   (denote-directory "~/Dropbox/denote")
+  :hook (dired-mode . denote-dired-mode)
+  :bind
+  (("C-c n n" . denote-create-note)
+     ("C-c n d" . denote-date)
+     ("C-c n i" . denote-link-or-create)
+     ("C-c n l" . denote-find-link)
+     ("C-c n b" . denote-find-backlink)
+     ("C-c n r" . denote-rename-file)
+     ("C-c n R" . denote-rename-file-using-front-matter)
+     ("C-c n k" . denote-keywords-add)
+     ("C-c n K" . denote-keywords-remove))
   )
 (require 'ox-beamer)
 (require 'ox-latex)
