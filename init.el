@@ -63,6 +63,25 @@
       `((".*" ,temporary-file-directory t)))
 
 
+(use-package vertico
+    :init
+    (vertico-mode)
+    :custom
+    (vertico-sort-function 'vertico-sort-history-alpha))
+
+ (use-package orderless
+    :custom
+    (completion-styles '(orderless basic))
+    (completion-category-defaults nil)
+    (completion-category-overrides
+     '((file (styles partial-completion)))))
+
+;; Enable richer annotations using the Marginalia package
+  (use-package marginalia
+    :init
+    (marginalia-mode))
+
+
 ;; Major mode Hooks
 (add-hook 'after-init-hook 'global-company-mode)
 
@@ -107,7 +126,6 @@
 (add-hook 'TeX-mode-hook #'eglot-ensure)
 
 (use-package pdf-tools
-  :ensure t
   :magic ("%PDF" . pdf-view-mode)
   :pin manual ;; don't reinstall when package updates
   :mode  ("\\.pdf\\'" . pdf-view-mode)
@@ -240,22 +258,59 @@
    :map helm-command-map
    ("b" . helm-bibtex)))
 
-(use-package citar
-  :no-require
-  :custom
-  (org-cite-global-bibliography '("~/Dropbox/Library/master.bib"))
-  (org-cite-insert-processor 'citar)
-  (org-cite-follow-processor 'citar)
-  (org-cite-activate-processor 'citar)
-  (citar-bibliography org-cite-global-bibliography)
-  (citar-library-paths '("~/Dropbox/Library/pdf/"))
-  (citar-notes-paths '("~/Dropbox/org/roam/reference"))
-  (citar-file-notes-extensions '("org"))
-  ;; optional: org-cite-insert is also bound to C-c C-x C-@
-  :bind
-  (:map org-mode-map :package org ("C-c b" . #'org-cite-insert))
-  )
+;; Managing Bibliographies
+  (use-package bibtex
+    :custom
+    (bibtex-dialect 'biblatex)
+    (bibtex-user-optional-fields
+     '(("keywords" "Keywords to describe the entry" "")
+       ("file" "Link to a document file." "" )))
+    (bibtex-align-at-equal-sign t))
 
+(use-package biblio)
+
+;; (use-package citar
+;;   :custom
+;;   (citar-library-paths '("~/Dropbox/Library/pdf/"))
+;;   (citar-notes-paths '("~/Dropbox/org/roam/reference"))
+;;   (citar-file-notes-extensions '("org"))
+;;   ;; optional: org-cite-insert is also bound to C-c C-x C-@
+;;   :bind
+;;   (:map org-mode-map :package org ("C-c b" . #'org-cite-insert))
+;;   )
+
+  ;; Citar to access bibliographies
+  (use-package citar
+    :custom
+    (org-cite-global-bibliography
+     (directory-files "~/Dropbox/Library/bib" t
+      "^[A-Z|a-z|0-9].+.bib$"))
+    (citar-bibliography org-cite-global-bibliography)
+    (org-cite-insert-processor 'citar)
+    (org-cite-follow-processor 'citar)
+    (org-cite-activate-processor 'citar)
+    :bind
+    (("C-c w c c" . citar-open)
+     (:map org-mode-map
+           :package org
+           ("C-c w C". #'org-cite-insert))))
+
+  (use-package citar-denote
+    :config
+    (citar-denote-mode)
+    :custom
+    (citar-open-always-create-notes t)
+    :bind (("C-c w c n" . citar-create-note)
+           ("C-c w c o" . citar-denote-open-note)
+           ("C-c w c f" . citar-denote-find-citation)
+           ("C-c w c d" . citar-denote-dwim)
+           ("C-c w c e" . citar-denote-open-reference-entry)
+           ("C-c w c a" . citar-denote-add-citekey)
+           ("C-c w c k" . citar-denote-remove-citekey)
+           ("C-c w c r" . citar-denote-find-reference)
+           ("C-c w c l" . citar-denote-link-reference)
+           ("C-c w c x" . citar-denote-nocite)
+           ("C-c w c y" . citar-denote-cite-nocite)))
 
 (use-package org-noter
   :ensure t
@@ -277,6 +332,19 @@
      ("C-c n k" . denote-keywords-add)
      ("C-c n K" . denote-keywords-remove))
   )
+
+;; Denote extensions
+(use-package consult-notes
+  :commands (consult-notes
+             consult-notes-search-in-all-notes)
+  :custom
+  (consult-notes-file-dir-sources
+   `(("Denote" ?d ,"~/Dropbox/denote")))
+  :bind
+  (("C-c n f" . consult-notes)
+   ("C-c n s" . consult-notes-search-in-all-notes)))
+
+
 (require 'ox-beamer)
 (require 'ox-latex)
 (setq org-export-allow-bind-keywords t)
@@ -554,7 +622,7 @@
    '("/mnt/c/Users/jesse/Dropbox/org/research.org" "/home/jmendez/Dropbox/org/inbox.org" "/home/jmendez/Dropbox/org/project.org" "/home/jmendez/Dropbox/org/gtd.org" "/home/jmendez/Dropbox/org/cal_calendar.org"))
  '(org-fold-core-style 'overlays)
  '(package-selected-packages
-   '(denote org-cliplink org-gcal slack deft eat org-noter ebdb pdf-tools alert-toast gnus-desktop-notify company auctex magit org-fragtog use-package helm-bibtex eglot calfw-org calfw)))
+   '(citar-denote consult-notes marginalia orderless vertico denote org-cliplink org-gcal slack deft eat org-noter ebdb pdf-tools alert-toast gnus-desktop-notify company auctex magit org-fragtog use-package helm-bibtex eglot calfw-org calfw)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
