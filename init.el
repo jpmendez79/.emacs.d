@@ -206,7 +206,7 @@
 			   ("~/Dropbox/org/project.org" :maxlevel . 9)
 			   ("~/Dropbox/org/cal_calendar.org" :maxlevel . 9)))
 (setq org-refile-use-outline-path 'file)
-;; (setq org-refile-allow-creating-parent-nodes t)					; Show full paths for refiling
+(setq org-refile-allow-creating-parent-nodes t)					; Show full paths for refiling
 (setq org-plantuml-exec-mode 'plantuml)
 (setq org-plantuml-executable-path "/usr/bin/plantuml")
 
@@ -283,7 +283,7 @@
   (use-package citar
     :custom
     (org-cite-global-bibliography
-     (directory-files "~/Dropbox/Library/bib" t
+     (directory-files "~/Dropbox/Library/" t
       "^[A-Z|a-z|0-9].+.bib$"))
     (citar-bibliography org-cite-global-bibliography)
     (org-cite-insert-processor 'citar)
