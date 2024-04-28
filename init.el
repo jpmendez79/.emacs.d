@@ -1,4 +1,4 @@
-(load-file "~/.emacs.d/config.el")
+;; (load-file "~/.emacs.d/config.el")
 ;; Loads config while saving this for... stuff.
 ;; Place this in init.el
 (load-file "~/.emacs.d/config.el")
