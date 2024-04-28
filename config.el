@@ -1,0 +1,459 @@
+;; Loads config while saving this for... stuff.
+;; Place this in init.el
+;; (load-file "~/.emacs.d/config.el")
+
+;; Package Manager and Use package setup
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/"))
+(package-initialize)
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(eval-and-compile
+  (setq use-package-always-ensure t
+        use-package-expand-minimally t))
+
+(if (and (eq system-type 'gnu/linux)
+         (getenv "WSLENV"))
+    ;; WSL specific settings
+    (message "WSL")
+  ;; The bell -__-
+  (setq visible-bell       nil
+	ring-bell-function #'ignore)
+  ;; Change the font size
+  (add-to-list 'default-frame-alist
+               '(font . "DejaVu Sans Mono-12"))
+  ;; Teach Emacs how to open links in your default Windows browser
+  (setq
+   browse-url-generic-program  "/mnt/c/Windows/System32/cmd.exe"
+   browse-url-generic-args     '("/c" "start")
+   browse-url-browser-function #'browse-url-generic)
+
+  ;; (load-file "~/.emacs.d/linux.el"))
+;;; Linux specific Settings
+  (message "Linux")
+  ;; Package Manager
+  (require 'notifications)
+  (setq alert-default-style 'notifier)
+  ;; OS Specific Stuff
+  (add-to-list 'load-path "/usr/share/emacs/site-lisp/pdf-tools/")
+  ;; Browser Settings
+  (setq browse-url-browser-function 'browse-url-generic
+	browse-url-generic-program "/usr/bin/firefox-bin"))
+
+;; Defun Section
+(defun my-org-hook ()
+  (flyspell-mode 1)
+  (org-fragtog-mode 1)
+  (visual-line-mode 1)
+  )
+(defun my-ledger-hook ()
+  (setq-local tab-always-indent 'complete)
+  (setq-local completion-cycle-threshold t)
+  (setq-local ledger-complete-in-steps t))
+
+(defun my-c-mode-common-hook ()
+  (c-toggle-auto-newline 1)
+  ;; (flycheck-prog-mode 1)
+  )
+
+(defun shortened-path (path max-len)
+  "Return a modified version of `path', replacing some components
+      with single characters starting from the left to try and get
+      the path down to `max-len'"
+  (let* ((components (split-string (abbreviate-file-name path) "/"))
+         (len (+ (1- (length components))
+                 (cl-reduce '+ components :key 'length)))
+         (str ""))
+    (while (and (> len max-len)
+                (cdr components))
+      (setq str (concat str (if (= 0 (length (car components)))
+                                "/"
+                              (string (elt (car components) 0) ?/)))
+            len (- len (1- (length (car components))))
+            components (cdr components)))
+    (concat str (cl-reduce (lambda (a b) (concat a "/" b)) components))))
+
+;; Look and feel
+(require 'notifications)
+(display-time-mode 1)
+(display-battery-mode 1)
+(column-number-mode 1)
+
+;; Save File
+(setq delete-old-versions t)
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+      `((".*" ,temporary-file-directory t)))
+
+;; Images in dired
+(autoload 'iimage-mode "iimage" "Support Inline image minor mode." t)
+(autoload 'turn-on-iimage-mode "iimage" "Turn on Inline image minor mode." t)
+;; Eshell
+(add-hook 'eshell-mode-hook (lambda () (setenv "TERM" "xterm-256color")))
+
+
+;; Major mode Hooks
+(add-hook 'after-init-hook 'global-company-mode)
+
+;; Personal Info and PIM Settings
+(setq user-full-name "Jesse Mendez"
+      user-mail-address "jmend46@lsu.edu")
+(setq compose-mail-user-agent-warnings nil)
+(setq message-send-mail-function 'message-send-mail-with-sendmail)
+(setq calendar-latitude 30.4)
+(setq calendar-longitude -91.18)
+(setq holiday-bahai-holidays nil)
+(setq holiday-hebrew-holidays nil)
+(setq holiday-islamic-holidays nil)
+
+;; Utilities and Tools
+;; Programming Settings
+(setq c-default-style '((java-mode . "java")
+			(awk-mode . "awk")
+			(other . "linux")))
+(setq-default c-electric-flag t)
+
+(setq c-toggle-electric-state 1)
+(add-hook 'c-mode-hook 'c-toggle-auto-newline 1)
+(add-hook 'emacs-lisp-mode-hook 'electric-pair-mode)
+(add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
+(add-hook 'c++-mode-hook 'eglot-ensure)
+
+(use-package vertico
+  :ensure t
+  :init
+  (vertico-mode)
+  :custom
+  (vertico-sort-function 'vertico-sort-history-alpha))
+
+(use-package orderless
+  :ensure t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-defaults nil)
+  (completion-category-overrides
+   '((file (styles partial-completion)))))
+
+;; Enable richer annotations using the Marginalia package
+(use-package marginalia
+  :ensure t
+  :init
+  (marginalia-mode))
+
+;; Setup EBDB for contacts
+(use-package ebdb
+  :config
+  (setq ebdb-mua-auto-update-p 'query)
+  (setq ebdb-gnus-auto-update-p 'query)
+  (setq edbd-default-window-size 0.2)
+  (setq ebdb-sources "~/Dropbox/org/ebdb")
+  (require 'ebdb-message)
+  (require 'ebdb-gnus)
+  (require 'ebdb-org))
+
+
+(use-package calfw
+  :ensure t)
+
+(use-package calfw-org
+  :ensure t
+  ;; :bind
+  ;; ("M-<f3>" . cfw:open-org-calendar)
+  :config
+  ;; hotfix: incorrect time range display
+  ;; source: https://github.com/zemaye/emacs-calfw/commit/3d17649c545423d919fd3bb9de2efe6dfff210fe
+  )
+
+;; Tex and Latex Settings
+(setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+      TeX-source-correlate-start-server t)
+(add-hook 'TeX-after-compilation-finished-functions
+          #'TeX-revert-document-buffer)
+(add-hook 'TeX-mode-hook #'eglot-ensure)
+
+(use-package pdf-tools
+  :magic ("%PDF" . pdf-view-mode)
+  :pin manual ;; don't reinstall when package updates
+  :mode  ("\\.pdf\\'" . pdf-view-mode)
+  :config
+  (setq-default pdf-view-display-size 'fit-page)
+  (setq pdf-annot-activate-created-annotations t)
+  (require 'pdf-occur)
+  (pdf-tools-install :no-query))
+
+
+;; Nov.el File associations
+(add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+
+;; Org Mode and various org packages
+(use-package org
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((ditaa . t)
+     (python . t)
+     (plantuml . t)
+     ))
+  :hook (org-mode . my-org-hook)
+  :custom
+  (org-agenda-timegrid-use-ampm t)
+  (org-agenda-include-diary t)
+  (org-stuck-projects
+   '("+Project-someday+LEVEL=1/-DONE-CANCELED-someday" ("NEXT" "WAITING")))
+  (org-todo-keywords
+   '((sequence "NEXT(n)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
+  (org-capture-templates
+   '(
+     ("a" "Capture an Appointment")
+     ("ap" "Personal Calendar Appointment" entry (file  "~/Dropbox/org/cal_calendar.org" )
+      "* %?\n\n:PROPERTIES:\n\n:END:\n\n")
+     ("as" "School Calendar Appointment" entry (file  "~/Dropbox/org/cal_school.org" )
+      "* %?\n\n:PROPERTIES:\n\n:END:\n\n")
+     ("i" "Capture an idea to inbox" entry (file "~/Dropbox/org/inbox.org") "* %?\n")))
+  (org-directory "~/Dropbox/org")
+  (org-agenda-custom-commands 
+   '(("n" "Anywhere" tags-todo "@anywhere-someday")
+     ("c" "Computer" tags-todo "@computer-someday|@laptop-someday")
+     ("e" "Errands" tags-todo "@errand-someday")
+     ("p" "Phone" tags-todo "@phone-someday")
+     ("o" "Internet" tags-todo "@online-someday")
+     ("h" "Home" tags-todo "@home-someday")
+     ("l" "LSU Campus" tags-todo "@campus-someday")
+     ("s" "LArASIC Lab" tags-todo "@larasic-someday")
+     ("r" "Research" tags-todo "@research-someday")
+     ("w" "Homework" tags-todo "@homework-someday")
+     ("m" "Personal Computer mercury" tags-todo "@mercury-someday")
+     ("b" "Work Computer bortan" tags-todo "@bortan-someday")
+     ("g" "Agendas" tags-todo "@agenda-someday")
+     ("W" "Weekly Review"
+      ((agenda "" ((org-agenda-span 7))); review upcoming deadlines and appointments
+       (tags "inbox")
+       (tags-todo "-someday-inbox")					  ; type "l" in the agenda to review logged items
+       (stuck "") ; review stuck projects as designated by org-stuck-projects
+       (tags "Project-someday+LEVEL=1") ; review all projects (assuming you use todo keywords to designate projects)
+       (tags-todo "-someday+TODO=\"WAITING\"")
+
+       (tags "someday+LEVEL=2")))))
+  :config
+  (setq org-agenda-files '("~/Dropbox/org/inbox.org"
+			   "~/Dropbox/org/project.org"
+			   "~/Dropbox/org/gtd.org"
+			   "~/Dropbox/org/cal_calendar.org"))
+
+  (setq org-refile-targets '((nil :maxlevel . 9)
+			     ("~/Dropbox/org/someday.org" :maxlevel . 9)
+			     ("~/Dropbox/org/gtd.org" :maxlevel . 3)
+			     ("~/Dropbox/org/project.org" :maxlevel . 9)
+			     ("~/Dropbox/org/cal_calendar.org" :maxlevel . 9)))
+  ;; Looks
+  (setq-default org-startup-indented t
+		org-pretty-entities t
+		org-use-sub-superscripts "{}"
+		org-hide-emphasis-markers t
+		org-startup-with-inline-images t
+		org-image-actual-width '(300))
+  (setq org-refile-use-outline-path 'file)
+  (setq org-refile-allow-creating-parent-nodes t)					; Show full paths for refiling
+  (setq org-outline-path-complete-in-steps nil)
+  (setq org-plantuml-exec-mode 'plantuml)
+  (setq org-plantuml-executable-path "/usr/bin/plantuml")
+
+  (global-set-key "\C-cl" 'org-store-link)
+  (global-set-key "\C-cc" 'org-capture)
+  (global-set-key "\C-ca" 'org-agenda)
+  (global-set-key "\C-c." 'org-time-stamp)
+  (global-set-key "\C-cp" 'org-pomodoro)
+  (global-set-key "\C-co" 'org-noter)
+  (global-set-key "\C-cu" 'org-reset-checkbox-state-subtree)
+
+  (setq org-tags-exclude-from-inheritance "project")
+
+  (setq org-todo-keywords
+	'((sequence "NEXT(n)" "|" "DONE(d)" "Delegated(D)")
+	  (sequence "WAITING(w)" "APPT(a)" )
+	  (sequence "|" "CANCELED(c)")))
+  (require 'ox-beamer)
+  (require 'ox-latex)
+  (setq org-export-allow-bind-keywords t)
+  (setq org-latex-listings 'minted)
+  (add-to-list 'org-latex-packages-alist '("" "minted"))
+  (setq org-latex-pdf-process
+	'("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+	  "bibtex %b"
+	  "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+	  "bibtex %b"
+	  "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+	  "bibtex %b"))
+  (setq org-latex-minted-options '(("breaklines" "true")
+				   ("breakanywhere" "true")))
+  (setq org-latex-pdf-process
+	(mapcar
+	 (lambda (s)
+	   (replace-regexp-in-string "%latex " "%latex -shell-escape " s))
+	 org-latex-pdf-process))
+  )
+
+(use-package org-crypt
+  :ensure nil
+  :config
+  (org-crypt-use-before-save-magic)
+  (setq org-tags-exclude-from-inheritance (quote ("crypt")))
+  )
+
+(use-package helm-bibtex
+  :ensure t
+  :config
+  (setq bibtex-completion-bibliography "~/Dropbox/Library/main.bib"
+        bibtex-completion-library-path "~/Dropbox/Library/pdf"
+        bibtex-completion-pdf-field "File"
+        bibtex-completion-notes-path "~/Dropbox/org/roam/reference")
+  (setq bibtex-completion-pdf-symbol "⌘")
+  (setq bibtex-completion-notes-symbol "✎")
+  (setq bibtex-completion-additional-search-fields '(journal booktitle))
+  (setq bibtex-completion-notes-extension ".org")
+  (setq bibtex-completion-pdf-extension '(".pdf" ".djvu" ".txt"))
+  ;; Para abrir URL/DOIs
+  (setq bibtex-completion-browser-function
+        (lambda (url _) (start-process "firefox" "*firefox*" "firefox" url)))
+
+  (helm-add-action-to-source
+   "Open annotated PDF (if present)" 'helm-bibtex-open-annotated-pdf
+   helm-source-bibtex 1)
+  :bind
+  (("C-x C-b" . helm-bibtex)
+   ("<menu>" . helm-bibtex)
+   :map helm-command-map
+   ("b" . helm-bibtex)))
+
+;; Managing Bibliographies
+(use-package bibtex
+  :ensure nil
+  :custom
+  (bibtex-dialect 'biblatex)
+  (bibtex-user-optional-fields
+   '(("keywords" "Keywords to describe the entry" "")
+     ("file" "Link to a document file." "" )))
+  (bibtex-align-at-equal-sign t))
+
+(use-package biblio)
+
+(use-package org-modern
+  :hook
+  (org-mode . global-org-modern-mode)
+  :custom
+  (org-modern-keyword nil)
+  (org-modern-checkbox nil)
+  (org-modern-table nil))
+;; LaTeX previews
+(use-package org-fragtog
+  :after org
+  :custom
+  (org-startup-with-latex-preview t)
+  :hook
+  (org-mode . org-fragtog-mode)
+  :custom
+  (org-format-latex-options
+   (plist-put org-format-latex-options :scale 2)
+   (plist-put org-format-latex-options :foreground 'auto)
+   (plist-put org-format-latex-options :background 'auto)))
+
+;; Citar to access bibliographies
+(use-package citar
+  :custom
+  (org-cite-global-bibliography
+   (directory-files "~/Dropbox/Library/" t
+		    "^[A-Z|a-z|0-9].+.bib$"))
+  (citar-bibliography org-cite-global-bibliography)
+  (org-cite-insert-processor 'citar)
+  (org-cite-follow-processor 'citar)
+  (org-cite-activate-processor 'citar)
+  :bind
+  (("C-c w c c" . citar-open)
+   (:map org-mode-map
+         :package org
+         ("C-c w C". #'org-cite-insert))))
+
+(use-package citar-denote
+  :config
+  (citar-denote-mode)
+  :custom
+  (citar-open-always-create-notes t)
+  :bind (("C-c w c n" . citar-create-note)
+         ("C-c w c o" . citar-denote-open-note)
+         ("C-c w c f" . citar-denote-find-citation)
+         ("C-c w c d" . citar-denote-dwim)
+         ("C-c w c e" . citar-denote-open-reference-entry)
+         ("C-c w c a" . citar-denote-add-citekey)
+         ("C-c w c k" . citar-denote-remove-citekey)
+         ("C-c w c r" . citar-denote-find-reference)
+         ("C-c w c l" . citar-denote-link-reference)
+         ("C-c w c x" . citar-denote-nocite)
+         ("C-c w c y" . citar-denote-cite-nocite)))
+
+(use-package org-noter
+  :ensure t
+  )
+
+(use-package denote
+  :ensure t
+  :custom
+  (denote-directory "~/Dropbox/denote")
+  :hook (dired-mode . denote-dired-mode)
+  :bind
+  (("C-c n n" . denote-create-note)
+   ("C-c n d" . denote-date)
+   ("C-c n i" . denote-link-or-create)
+   ("C-c n l" . denote-find-link)
+   ("C-c n b" . denote-find-backlink)
+   ("C-c n r" . denote-rename-file)
+   ("C-c n R" . denote-rename-file-using-front-matter)
+   ("C-c n k" . denote-keywords-add)
+   ("C-c n K" . denote-keywords-remove))
+  )
+
+;; Denote extensions
+(use-package consult-notes
+  :commands (consult-notes
+             consult-notes-search-in-all-notes)
+  :custom
+  (consult-notes-file-dir-sources
+   `(("Denote" ?d ,"~/Dropbox/denote")))
+  :bind
+  (("C-c n f" . consult-notes)
+   ("C-c n s" . consult-notes-search-in-all-notes)))
+
+;; Eglot Server
+(use-package eglot
+  :ensure t
+  :config
+  (setq lsp-tex-server 'digestif)
+  )
+
+(use-package pyvenv
+  :ensure t
+  :init
+  (setenv "WORKON_HOME" "~/.virtualenvs/")
+  :config
+  ;; Set correct Python1 interpreter
+  (setq pyvenv-post-activate-hooks
+	(list (lambda ()
+		(setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python")))))
+  (setq pyvenv-post-deactivate-hooks
+	(list (lambda ()
+		(setq python-shell-interpreter "python")))))
+
+(use-package alert
+  :commands (alert)
+  :init
+  (setq alert-default-style 'notifier))
+
+;; Ledger mode
+(use-package ledger-mode
+  :hook (ledger-mode . my-ledger-hook)
+  )
+
+(server-start)
+
