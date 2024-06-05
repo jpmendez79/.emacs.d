@@ -51,6 +51,7 @@
 
 (defun my-c-mode-common-hook ()
   (c-toggle-auto-newline 1)
+  (display-line-numbers-mode)
   ;; (flycheck-prog-mode 1)
   )
 
