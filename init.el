@@ -2,7 +2,7 @@
 ;; Loads config while saving this for... stuff.
 ;; Place this in init.el
 (load-file "~/.emacs.d/config.el")
-
+;; Package Manager and Use package setup
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -184,7 +184,7 @@
    '("/mnt/c/Users/jesse/Dropbox/org/research.org" "/home/jmendez/Dropbox/org/inbox.org" "/home/jmendez/Dropbox/org/project.org" "/home/jmendez/Dropbox/org/gtd.org" "/home/jmendez/Dropbox/org/cal_calendar.org"))
  '(org-fold-core-style 'overlays)
  '(package-selected-packages
-   '(citar-denote consult-notes marginalia orderless vertico denote org-cliplink org-gcal slack deft eat org-noter ebdb pdf-tools alert-toast gnus-desktop-notify company auctex magit org-fragtog use-package helm-bibtex eglot calfw-org calfw)))
+   '(htmlize citar-denote consult-notes marginalia orderless vertico denote org-cliplink org-gcal deft eat org-noter ebdb pdf-tools alert-toast company auctex magit org-fragtog use-package eglot calfw-org calfw)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

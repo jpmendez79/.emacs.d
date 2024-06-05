@@ -14,33 +14,29 @@
   (setq use-package-always-ensure t
         use-package-expand-minimally t))
 
-(if (and (eq system-type 'gnu/linux)
-         (getenv "WSLENV"))
-    ;; WSL specific settings
-    (message "WSL")
-  ;; The bell -__-
+   (setq browse-url-browser-function 'browse-url-generic
+	 browse-url-generic-program "/usr/bin/firefox-bin")
+
+(when (and (eq system-type 'gnu/linux)
+           (getenv "WSLENV"))
+  (message "WSL")
   (setq visible-bell       nil
 	ring-bell-function #'ignore)
   ;; Change the font size
   (add-to-list 'default-frame-alist
-               '(font . "DejaVu Sans Mono-12"))
-  ;; Teach Emacs how to open links in your default Windows browser
+	       '(font . "DejaVu Sans Mono-18"))
   (setq
-   browse-url-generic-program  "/mnt/c/Windows/System32/cmd.exe"
-   browse-url-generic-args     '("/c" "start")
+   browse-url-generic-program  "/home/jmendez/.local/bin/wsl-browse.sh"
    browse-url-browser-function #'browse-url-generic)
 
-  ;; (load-file "~/.emacs.d/linux.el"))
-;;; Linux specific Settings
-  (message "Linux")
-  ;; Package Manager
-  (require 'notifications)
-  (setq alert-default-style 'notifier)
-  ;; OS Specific Stuff
-  (add-to-list 'load-path "/usr/share/emacs/site-lisp/pdf-tools/")
-  ;; Browser Settings
-  (setq browse-url-browser-function 'browse-url-generic
-	browse-url-generic-program "/usr/bin/firefox-bin"))
+  )
+
+
+;; Package Manager
+  ;; (require 'notifications)
+  ;; (setq alert-default-style 'notifier)
+  ;; ;; OS Specific Stuff
+  ;; (add-to-list 'load-path "/usr/share/emacs/site-lisp/pdf-tools/")
 
 ;; Defun Section
 (defun my-org-hook ()
@@ -212,7 +208,9 @@
       "* %?\n\n:PROPERTIES:\n\n:END:\n\n")
      ("as" "School Calendar Appointment" entry (file  "~/Dropbox/org/cal_school.org" )
       "* %?\n\n:PROPERTIES:\n\n:END:\n\n")
-     ("i" "Capture an idea to inbox" entry (file "~/Dropbox/org/inbox.org") "* %?\n")))
+     ("i" "Capture an idea to inbox" entry (file "~/Dropbox/org/inbox.org") "* %?\n")
+     ("n" "Capture a next item" entry (file+headline "~/Dropbox/org/gtd.org" "Tasks") "* NEXT %?%^G\n")
+     ))
   (org-directory "~/Dropbox/org")
   (org-agenda-custom-commands 
    '(("n" "Anywhere" tags-todo "@anywhere-someday")
@@ -303,30 +301,30 @@
   (setq org-tags-exclude-from-inheritance (quote ("crypt")))
   )
 
-(use-package helm-bibtex
-  :ensure t
-  :config
-  (setq bibtex-completion-bibliography "~/Dropbox/Library/main.bib"
-        bibtex-completion-library-path "~/Dropbox/Library/pdf"
-        bibtex-completion-pdf-field "File"
-        bibtex-completion-notes-path "~/Dropbox/org/roam/reference")
-  (setq bibtex-completion-pdf-symbol "⌘")
-  (setq bibtex-completion-notes-symbol "✎")
-  (setq bibtex-completion-additional-search-fields '(journal booktitle))
-  (setq bibtex-completion-notes-extension ".org")
-  (setq bibtex-completion-pdf-extension '(".pdf" ".djvu" ".txt"))
-  ;; Para abrir URL/DOIs
-  (setq bibtex-completion-browser-function
-        (lambda (url _) (start-process "firefox" "*firefox*" "firefox" url)))
+;; (use-package helm-bibtex
+;;   :ensure t
+;;   :config
+;;   (setq bibtex-completion-bibliography "~/Dropbox/Library/main.bib"
+;;         bibtex-completion-library-path "~/Dropbox/Library/pdf"
+;;         bibtex-completion-pdf-field "File"
+;;         bibtex-completion-notes-path "~/Dropbox/org/roam/reference")
+;;   (setq bibtex-completion-pdf-symbol "⌘")
+;;   (setq bibtex-completion-notes-symbol "✎")
+;;   (setq bibtex-completion-additional-search-fields '(journal booktitle))
+;;   (setq bibtex-completion-notes-extension ".org")
+;;   (setq bibtex-completion-pdf-extension '(".pdf" ".djvu" ".txt"))
+;;   ;; Para abrir URL/DOIs
+;;   (setq bibtex-completion-browser-function
+;;         (lambda (url _) (start-process "firefox" "*firefox*" "firefox" url)))
 
-  (helm-add-action-to-source
-   "Open annotated PDF (if present)" 'helm-bibtex-open-annotated-pdf
-   helm-source-bibtex 1)
-  :bind
-  (("C-x C-b" . helm-bibtex)
-   ("<menu>" . helm-bibtex)
-   :map helm-command-map
-   ("b" . helm-bibtex)))
+;;   (helm-add-action-to-source
+;;    "Open annotated PDF (if present)" 'helm-bibtex-open-annotated-pdf
+;;    helm-source-bibtex 1)
+;;   :bind
+;;   (("C-x C-b" . helm-bibtex)
+;;    ("<menu>" . helm-bibtex)
+;;    :map helm-command-map
+;;    ("b" . helm-bibtex)))
 
 ;; Managing Bibliographies
 (use-package bibtex
@@ -360,6 +358,104 @@
    (plist-put org-format-latex-options :foreground 'auto)
    (plist-put org-format-latex-options :background 'auto)))
 
+;; COnfiguring Website Publishing
+(require 'ox-publish)
+(setq org-html-htmlize-output-type 'css)
+(setq org-publish-project-alist
+      `(("pages"
+         :base-directory "~/30-39_Education/32_Louisiana_State_University/32.47_website/org/"
+         :base-extension "org"
+					; Style Config
+	 :html-head "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://gongzhitaao.org/orgcss/org.css\"/>"
+					; HTML5
+	 :html-doctype "html5"
+	 :html-html5-fancy t
+					; Disable some Org's HTML defaults
+	 :html-head-include-scripts nil
+	 :html-head-include-default-style nil
+	 :html-preamble "
+<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+<style>
+body {margin: 0;}
+
+ul.topnav {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+ul.topnav li {float: left;}
+
+ul.topnav li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+ul.topnav li a:hover:not(.active) {background-color: #111;}
+
+ul.topnav li a.active {background-color: #04AA6D;}
+
+ul.topnav li.right {float: right;}
+
+@media screen and (max-width: 100%) {
+  ul.topnav li.right, 
+  ul.topnav li {float: none;}
+}
+</style>
+<ul class=\"topnav\">
+  <li><a href='/index.html'>Home</a></li>
+  <li><a href='/test.html'>Test</a></li>
+</ul>
+"
+	 :html-postamble "<hr/>
+<footer>
+  <div class=\"copyright-container\">
+    <div class=\"copyright\">
+      Copyright &copy; 2023-2024 Jesse Mendez some rights reserved<br/>
+      Content is available under
+      <a rel=\"license\" href=\"http://creativecommons.org/licenses/by-sa/4.0/\">
+        CC-BY-SA 4.0
+      </a> unless otherwise noted
+    </div>
+    <div class=\"cc-badge\">
+      <a rel=\"license\" href=\"http://creativecommons.org/licenses/by-sa/4.0/\">
+        <img alt=\"Creative Commons License\"
+             src=\"https://i.creativecommons.org/l/by-sa/4.0/88x31.png\" />
+      </a>
+    </div>
+  </div>
+
+  <div class=\"generated\">
+    Created with %c on <a href=\"https://www.gnu.org\">GNU</a>/<a href=\"https://www.kernel.org/\">Linux</a>
+  </div>
+</footer>"
+         :recursive t
+         :publishing-directory "~/30-39_Education/32_Louisiana_State_University/32.47_website/html/"
+         :publishing-function org-html-publish-to-html)
+
+        ("static"
+         :base-directory "~/30-39_Education/32_Louisiana_State_University/32.47_website/org/"
+         :base-extension "css\\|txt\\|jpg\\|gif\\|png"
+         :recursive t
+         :publishing-directory  "~/30-39_Education/32_Louisiana_State_University/32.47_website/html/"
+         :publishing-function org-publish-attachment)
+("blog"
+ :base-directory "~/30-39_Education/32_Louisiana_State_University/32.47_website/org/blog/"
+ :base-extension "org"
+ :publishing-directory "~/30-39_Education/32_Louisiana_State_University/32.47_website/html/blog/"
+ :publishing-function org-html-publish-to-html
+
+ :auto-sitemap t
+ :sitemap-title "Blog Posts"
+ :sitemap-filename "index.org"
+ :sitemap-sort-files anti-chronologically)
+
+("jessepmendez.com" :components ("pages" "blog" "static"))))
 ;; Citar to access bibliographies
 (use-package citar
   :custom
@@ -371,27 +467,11 @@
   (org-cite-follow-processor 'citar)
   (org-cite-activate-processor 'citar)
   :bind
-  (("C-c w c c" . citar-open)
+  (("C-c w b o" . citar-open)
    (:map org-mode-map
          :package org
          ("C-c w C". #'org-cite-insert))))
 
-(use-package citar-denote
-  :config
-  (citar-denote-mode)
-  :custom
-  (citar-open-always-create-notes t)
-  :bind (("C-c w c n" . citar-create-note)
-         ("C-c w c o" . citar-denote-open-note)
-         ("C-c w c f" . citar-denote-find-citation)
-         ("C-c w c d" . citar-denote-dwim)
-         ("C-c w c e" . citar-denote-open-reference-entry)
-         ("C-c w c a" . citar-denote-add-citekey)
-         ("C-c w c k" . citar-denote-remove-citekey)
-         ("C-c w c r" . citar-denote-find-reference)
-         ("C-c w c l" . citar-denote-link-reference)
-         ("C-c w c x" . citar-denote-nocite)
-         ("C-c w c y" . citar-denote-cite-nocite)))
 
 (use-package org-noter
   :ensure t
@@ -401,6 +481,7 @@
   :ensure t
   :custom
   (denote-directory "~/Dropbox/denote")
+  (denote-sort-keywords t)
   :hook (dired-mode . denote-dired-mode)
   :bind
   (("C-c n n" . denote-create-note)
@@ -413,6 +494,54 @@
    ("C-c n k" . denote-keywords-add)
    ("C-c n K" . denote-keywords-remove))
   )
+
+(use-package citar-denote
+  :config
+  (citar-denote-mode)
+  :custom
+  (citar-open-always-create-notes t)
+  (citar-notes-paths '("~/Dropbox/denote/"))
+  
+  :bind (("C-c w c n" . citar-create-note)
+         ("C-c w c o" . citar-denote-open-note)
+         ("C-c w c f" . citar-denote-find-citation)
+         ("C-c w c d" . citar-denote-dwim)
+         ("C-c w c e" . citar-denote-open-reference-entry)
+         ("C-c w c a" . citar-denote-add-citekey)
+         ("C-c w c k" . citar-denote-remove-citekey)
+         ("C-c w c r" . citar-denote-find-reference)
+         ("C-c w c l" . citar-denote-link-reference)
+         ("C-c w c x" . citar-denote-nocite)
+         ("C-c w c y" . citar-denote-cite-nocite)))
+
+;; Denote Explore
+(use-package denote-explore
+    :custom
+    ;; Where to store network data and in which format
+    (denote-explore-network-directory "~/Dropbox/denote/viz/")
+    (denote-explore-network-filename "denote-network")
+    (denote-explore-network-format 'graphviz)
+    (denote-explore-network-graphviz-filetype "pdf")
+    :bind
+    (;; Statistics
+     ("C-c w e c" . denote-explore-count-notes)
+     ("C-c w e C" . denote-explore-count-keywords)
+     ("C-c w e b" . denote-explore-keywords-barchart)
+     ("C-c w e x" . denote-explore-extensions-barchart)
+     ;; Random walks
+     ("C-c w e r" . denote-explore-random-note)
+     ("C-c w e l" . denote-explore-random-link)
+     ("C-c w e k" . denote-explore-random-keyword)
+     ;; Denote Janitor
+     ("C-c w e d" . denote-explore-identify-duplicate-notes)
+     ("C-c w e z" . denote-explore-zero-keywords)
+     ("C-c w e s" . denote-explore-single-keywords)
+     ("C-c w e o" . denote-explore-sort-keywords)
+     ("C-c w e r" . denote-explore-rename-keywords)
+     ;; Visualise denote
+     ("C-c w e n" . denote-explore-network)
+     ("C-c w e v" . denote-explore-network-regenerate)
+     ("C-c w e D" . denote-explore-degree-barchart)))
 
 ;; Denote extensions
 (use-package consult-notes
