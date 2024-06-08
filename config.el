@@ -10,6 +10,8 @@
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
+
+;; Application specific settings
 (eval-and-compile
   (setq use-package-always-ensure t
         use-package-expand-minimally t))
@@ -77,6 +79,16 @@
 (display-time-mode 1)
 (display-battery-mode 1)
 (column-number-mode 1)
+(add-to-list 'default-frame-alist
+             '(font . "DejaVu Sans Mono-11"))
+
+(use-package fira-code-mode
+  :config
+  (fira-code-mode-set-font)
+  (global-fira-code-mode)
+  :custom
+  (fira-code-mode-disabled-ligatures '("[]" "#{" "#(" "#_" "#_(" "x")) ;; List of ligatures to turn off
+  )
 
 ;; Save File
 (setq delete-old-versions t)
@@ -485,15 +497,15 @@ ul.topnav li.right {float: right;}
   (denote-sort-keywords t)
   :hook (dired-mode . denote-dired-mode)
   :bind
-  (("C-c n n" . denote-create-note)
-   ("C-c n d" . denote-date)
-   ("C-c n i" . denote-link-or-create)
-   ("C-c n l" . denote-find-link)
-   ("C-c n b" . denote-find-backlink)
-   ("C-c n r" . denote-rename-file)
-   ("C-c n R" . denote-rename-file-using-front-matter)
-   ("C-c n k" . denote-keywords-add)
-   ("C-c n K" . denote-keywords-remove))
+  (("C-c d n" . denote-create-note)
+   ("C-c d d" . denote-date)
+   ("C-c d i" . denote-link-or-create)
+   ("C-c d l" . denote-find-link)
+   ("C-c d b" . denote-find-backlink)
+   ("C-c d r" . denote-rename-file)
+   ("C-c d R" . denote-rename-file-using-front-matter)
+   ("C-c d k" . denote-keywords-add)
+   ("C-c d K" . denote-keywords-remove))
   )
 
 (use-package citar-denote
@@ -503,17 +515,17 @@ ul.topnav li.right {float: right;}
   (citar-open-always-create-notes t)
   (citar-notes-paths '("~/Dropbox/denote/"))
   
-  :bind (("C-c w c n" . citar-create-note)
-         ("C-c w c o" . citar-denote-open-note)
-         ("C-c w c f" . citar-denote-find-citation)
-         ("C-c w c d" . citar-denote-dwim)
-         ("C-c w c e" . citar-denote-open-reference-entry)
-         ("C-c w c a" . citar-denote-add-citekey)
-         ("C-c w c k" . citar-denote-remove-citekey)
-         ("C-c w c r" . citar-denote-find-reference)
-         ("C-c w c l" . citar-denote-link-reference)
-         ("C-c w c x" . citar-denote-nocite)
-         ("C-c w c y" . citar-denote-cite-nocite)))
+  :bind (("C-c b n" . citar-create-note)
+         ("C-c b o" . citar-denote-open-note)
+         ("C-c b f" . citar-denote-find-citation)
+         ("C-c b d" . citar-denote-dwim)
+         ("C-c b e" . citar-denote-open-reference-entry)
+         ("C-c b a" . citar-denote-add-citekey)
+         ("C-c b k" . citar-denote-remove-citekey)
+         ("C-c b r" . citar-denote-find-reference)
+         ("C-c b l" . citar-denote-link-reference)
+         ("C-c b x" . citar-denote-nocite)
+         ("C-c b y" . citar-denote-cite-nocite)))
 
 ;; Denote Explore
 (use-package denote-explore
