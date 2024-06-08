@@ -226,7 +226,7 @@
      ))
   (org-directory "~/Dropbox/org")
   (org-agenda-custom-commands 
-   '(("n" "Anywhere" tags-todo "@anywhere-someday")
+   '(
      ("c" "Computer" tags-todo "@computer-someday|@laptop-someday")
      ("e" "Errands" tags-todo "@errand-someday")
      ("p" "Phone" tags-todo "@phone-someday")
