@@ -24,7 +24,7 @@
   (message "WSL")
   (setq visible-bell       nil
 	ring-bell-function #'ignore)
-  ;; Change the font size
+  Change the font size
   (add-to-list 'default-frame-alist
 	       '(font . "DejaVu Sans Mono-18"))
   (setq
@@ -32,13 +32,6 @@
    browse-url-browser-function #'browse-url-generic)
 
   )
-
-
-;; Package Manager
-  ;; (require 'notifications)
-  ;; (setq alert-default-style 'notifier)
-  ;; ;; OS Specific Stuff
-  ;; (add-to-list 'load-path "/usr/share/emacs/site-lisp/pdf-tools/")
 
 ;; Defun Section
 (defun my-org-hook ()
@@ -79,8 +72,8 @@
 (display-time-mode 1)
 (display-battery-mode 1)
 (column-number-mode 1)
-(add-to-list 'default-frame-alist
-             '(font . "DejaVu Sans Mono-11"))
+;; (add-to-list 'default-frame-alist
+;;              '(font . "DejaVu Sans Mono-11"))
 
 (use-package fira-code-mode
   :config
@@ -184,6 +177,7 @@
 (add-hook 'TeX-mode-hook #'eglot-ensure)
 
 (use-package pdf-tools
+  :ensure f
   :magic ("%PDF" . pdf-view-mode)
   :pin manual ;; don't reinstall when package updates
   :mode  ("\\.pdf\\'" . pdf-view-mode)
@@ -391,7 +385,7 @@
 <style>
 body {margin: 0;}
 
-ul.topnav {
+ul.nav {
   list-style-type: none;
   margin: 0;
   padding: 0;
@@ -399,9 +393,9 @@ ul.topnav {
   background-color: #333;
 }
 
-ul.topnav li {float: left;}
+ul.nav li {float: left;}
 
-ul.topnav li a {
+ul.nav li a {
   display: block;
   color: white;
   text-align: center;
@@ -409,18 +403,18 @@ ul.topnav li a {
   text-decoration: none;
 }
 
-ul.topnav li a:hover:not(.active) {background-color: #111;}
+ul.nav li a:hover:not(.active) {background-color: #111;}
 
-ul.topnav li a.active {background-color: #04AA6D;}
+ul.nav li a.active {background-color: #04AA6D;}
 
-ul.topnav li.right {float: right;}
+ul.nav li.right {float: right;}
 
 @media screen and (max-width: 100%) {
-  ul.topnav li.right, 
-  ul.topnav li {float: none;}
+  ul.nav li.right, 
+  ul.nav li {float: none;}
 }
 </style>
-<ul class=\"topnav\">
+<ul class=\"nav\">
   <li><a href='/index.html'>Home</a></li>
   <li><a href='/test.html'>Test</a></li>
 </ul>
