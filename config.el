@@ -124,6 +124,8 @@
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 (add-hook 'c++-mode-hook 'eglot-ensure)
 
+(use-package rainbow-mode)
+
 (use-package vertico
   :ensure t
   :init
