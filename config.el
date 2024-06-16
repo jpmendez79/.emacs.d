@@ -23,8 +23,8 @@
   (setq visible-bell       nil
 	ring-bell-function #'ignore)
   ;; Change the font size
-  (add-to-list 'default-frame-alist
-	       '(font . "DejaVu Sans Mono-18"))
+  ;; (add-to-list 'default-frame-alist
+  ;; 	       '(font . "DejaVu Sans Mono-18"))
   (setq
    browse-url-generic-program  "/home/jmendez/.local/bin/wsl-browse.sh"
    browse-url-browser-function #'browse-url-generic)
@@ -77,6 +77,11 @@
 (display-time-mode 1)
 (display-battery-mode 1)
 (column-number-mode 1)
+
+(use-package fira-code-mode
+  :config
+  (global-fira-code-mode)
+  )
 
 ;; Save File
 (setq delete-old-versions t)
@@ -464,6 +469,7 @@ ul.topnav li.right {float: right;}
    (directory-files "~/Dropbox/Library/" t
 		    "^[A-Z|a-z|0-9].+.bib$"))
   (citar-bibliography org-cite-global-bibliography)
+  (citar-library-paths '("~/Dropbox/Library"))
   (org-cite-insert-processor 'citar)
   (org-cite-follow-processor 'citar)
   (org-cite-activate-processor 'citar)
