@@ -10,6 +10,8 @@
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
+
+;; Application specific settings
 (eval-and-compile
   (setq use-package-always-ensure t
         use-package-expand-minimally t))
@@ -22,21 +24,20 @@
   (message "WSL")
   (setq visible-bell       nil
 	ring-bell-function #'ignore)
+<<<<<<< HEAD
   ;; Change the font size
   ;; (add-to-list 'default-frame-alist
   ;; 	       '(font . "DejaVu Sans Mono-18"))
+=======
+  Change the font size
+  (add-to-list 'default-frame-alist
+	       '(font . "DejaVu Sans Mono-18"))
+>>>>>>> origin/master
   (setq
    browse-url-generic-program  "/home/jmendez/.local/bin/wsl-browse.sh"
    browse-url-browser-function #'browse-url-generic)
 
   )
-
-
-;; Package Manager
-  ;; (require 'notifications)
-  ;; (setq alert-default-style 'notifier)
-  ;; ;; OS Specific Stuff
-  ;; (add-to-list 'load-path "/usr/share/emacs/site-lisp/pdf-tools/")
 
 ;; Defun Section
 (defun my-org-hook ()
@@ -77,6 +78,16 @@
 (display-time-mode 1)
 (display-battery-mode 1)
 (column-number-mode 1)
+;; (add-to-list 'default-frame-alist
+;;              '(font . "DejaVu Sans Mono-11"))
+
+(use-package fira-code-mode
+  :config
+  (fira-code-mode-set-font)
+  (global-fira-code-mode)
+  :custom
+  (fira-code-mode-disabled-ligatures '("[]" "#{" "#(" "#_" "#_(" "x")) ;; List of ligatures to turn off
+  )
 
 (use-package fira-code-mode
   :config
@@ -123,6 +134,8 @@
 (add-hook 'emacs-lisp-mode-hook 'electric-pair-mode)
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 (add-hook 'c++-mode-hook 'eglot-ensure)
+
+(use-package rainbow-mode)
 
 (use-package vertico
   :ensure t
@@ -177,6 +190,7 @@
 (add-hook 'TeX-mode-hook #'eglot-ensure)
 
 (use-package pdf-tools
+  :ensure f
   :magic ("%PDF" . pdf-view-mode)
   :pin manual ;; don't reinstall when package updates
   :mode  ("\\.pdf\\'" . pdf-view-mode)
@@ -219,7 +233,7 @@
      ))
   (org-directory "~/Dropbox/org")
   (org-agenda-custom-commands 
-   '(("n" "Anywhere" tags-todo "@anywhere-someday")
+   '(
      ("c" "Computer" tags-todo "@computer-someday|@laptop-someday")
      ("e" "Errands" tags-todo "@errand-someday")
      ("p" "Phone" tags-todo "@phone-someday")
@@ -384,7 +398,7 @@
 <style>
 body {margin: 0;}
 
-ul.topnav {
+ul.nav {
   list-style-type: none;
   margin: 0;
   padding: 0;
@@ -392,9 +406,9 @@ ul.topnav {
   background-color: #333;
 }
 
-ul.topnav li {float: left;}
+ul.nav li {float: left;}
 
-ul.topnav li a {
+ul.nav li a {
   display: block;
   color: white;
   text-align: center;
@@ -402,18 +416,18 @@ ul.topnav li a {
   text-decoration: none;
 }
 
-ul.topnav li a:hover:not(.active) {background-color: #111;}
+ul.nav li a:hover:not(.active) {background-color: #111;}
 
-ul.topnav li a.active {background-color: #04AA6D;}
+ul.nav li a.active {background-color: #04AA6D;}
 
-ul.topnav li.right {float: right;}
+ul.nav li.right {float: right;}
 
 @media screen and (max-width: 100%) {
-  ul.topnav li.right, 
-  ul.topnav li {float: none;}
+  ul.nav li.right, 
+  ul.nav li {float: none;}
 }
 </style>
-<ul class=\"topnav\">
+<ul class=\"nav\">
   <li><a href='/index.html'>Home</a></li>
   <li><a href='/test.html'>Test</a></li>
 </ul>
@@ -491,15 +505,15 @@ ul.topnav li.right {float: right;}
   (denote-sort-keywords t)
   :hook (dired-mode . denote-dired-mode)
   :bind
-  (("C-c n n" . denote-create-note)
-   ("C-c n d" . denote-date)
-   ("C-c n i" . denote-link-or-create)
-   ("C-c n l" . denote-find-link)
-   ("C-c n b" . denote-find-backlink)
-   ("C-c n r" . denote-rename-file)
-   ("C-c n R" . denote-rename-file-using-front-matter)
-   ("C-c n k" . denote-keywords-add)
-   ("C-c n K" . denote-keywords-remove))
+  (("C-c d n" . denote-create-note)
+   ("C-c d d" . denote-date)
+   ("C-c d i" . denote-link-or-create)
+   ("C-c d l" . denote-find-link)
+   ("C-c d b" . denote-find-backlink)
+   ("C-c d r" . denote-rename-file)
+   ("C-c d R" . denote-rename-file-using-front-matter)
+   ("C-c d k" . denote-keywords-add)
+   ("C-c d K" . denote-keywords-remove))
   )
 
 (use-package citar-denote
@@ -509,17 +523,17 @@ ul.topnav li.right {float: right;}
   (citar-open-always-create-notes t)
   (citar-notes-paths '("~/Dropbox/denote/"))
   
-  :bind (("C-c w c n" . citar-create-note)
-         ("C-c w c o" . citar-denote-open-note)
-         ("C-c w c f" . citar-denote-find-citation)
-         ("C-c w c d" . citar-denote-dwim)
-         ("C-c w c e" . citar-denote-open-reference-entry)
-         ("C-c w c a" . citar-denote-add-citekey)
-         ("C-c w c k" . citar-denote-remove-citekey)
-         ("C-c w c r" . citar-denote-find-reference)
-         ("C-c w c l" . citar-denote-link-reference)
-         ("C-c w c x" . citar-denote-nocite)
-         ("C-c w c y" . citar-denote-cite-nocite)))
+  :bind (("C-c b n" . citar-create-note)
+         ("C-c b o" . citar-denote-open-note)
+         ("C-c b f" . citar-denote-find-citation)
+         ("C-c b d" . citar-denote-dwim)
+         ("C-c b e" . citar-denote-open-reference-entry)
+         ("C-c b a" . citar-denote-add-citekey)
+         ("C-c b k" . citar-denote-remove-citekey)
+         ("C-c b r" . citar-denote-find-reference)
+         ("C-c b l" . citar-denote-link-reference)
+         ("C-c b x" . citar-denote-nocite)
+         ("C-c b y" . citar-denote-cite-nocite)))
 
 ;; Denote Explore
 (use-package denote-explore
