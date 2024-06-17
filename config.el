@@ -24,15 +24,9 @@
   (message "WSL")
   (setq visible-bell       nil
 	ring-bell-function #'ignore)
-<<<<<<< HEAD
   ;; Change the font size
   ;; (add-to-list 'default-frame-alist
   ;; 	       '(font . "DejaVu Sans Mono-18"))
-=======
-  Change the font size
-  (add-to-list 'default-frame-alist
-	       '(font . "DejaVu Sans Mono-18"))
->>>>>>> origin/master
   (setq
    browse-url-generic-program  "/home/jmendez/.local/bin/wsl-browse.sh"
    browse-url-browser-function #'browse-url-generic)
@@ -135,7 +129,9 @@
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 (add-hook 'c++-mode-hook 'eglot-ensure)
 
-(use-package rainbow-mode)
+(use-package rainbow-mode
+  :ensure t
+  )
 
 (use-package vertico
   :ensure t
