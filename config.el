@@ -4,8 +4,10 @@
 
 ;; Package Manager and Use package setup
 (require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/"))
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
+
 (package-initialize)
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -30,6 +32,16 @@
   (setq
    browse-url-generic-program  "/home/jmendez/.local/bin/wsl-browse.sh"
    browse-url-browser-function #'browse-url-generic)
+  ;; (setq browse-url-browser-function 'browse-url-generic
+  ;; 	browse-url-generic-program "explorer.exe")
+  ;; (let ((cmd-exe "/mnt/c/Windows/System32/cmd.exe")
+  ;;       (cmd-args '("/c" "start")))
+  ;;   (when (file-exists-p cmd-exe)
+  ;;     (setq browse-url-generic-program  cmd-exe
+  ;;           browse-url-generic-args     cmd-args
+  ;;           browse-url-browser-function 'browse-url-generic
+  ;;           search-web-default-browser 'browse-url-generic)))
+
 
   )
 
@@ -38,11 +50,14 @@
   (flyspell-mode 1)
   (org-fragtog-mode 1)
   (visual-line-mode 1)
+  (fira-code-mode 1)
   )
 (defun my-ledger-hook ()
   (setq-local tab-always-indent 'complete)
   (setq-local completion-cycle-threshold t)
-  (setq-local ledger-complete-in-steps t))
+  (setq-local ledger-complete-in-steps t)
+  (fira-code-mode 1)
+  )
 
 (defun my-c-mode-common-hook ()
   (c-toggle-auto-newline 1)
@@ -78,15 +93,12 @@
 (use-package fira-code-mode
   :config
   (fira-code-mode-set-font)
-  (global-fira-code-mode)
+  :hook prog-mode
+  ;; (global-fira-code-mode)
   :custom
   (fira-code-mode-disabled-ligatures '("[]" "#{" "#(" "#_" "#_(" "x")) ;; List of ligatures to turn off
   )
 
-(use-package fira-code-mode
-  :config
-  (global-fira-code-mode)
-  )
 
 ;; Save File
 (setq delete-old-versions t)
@@ -100,10 +112,6 @@
 (autoload 'turn-on-iimage-mode "iimage" "Turn on Inline image minor mode." t)
 ;; Eshell
 (add-hook 'eshell-mode-hook (lambda () (setenv "TERM" "xterm-256color")))
-
-
-;; Major mode Hooks
-(add-hook 'after-init-hook 'global-company-mode)
 
 ;; Personal Info and PIM Settings
 (setq user-full-name "Jesse Mendez"
@@ -594,7 +602,7 @@ ul.nav li.right {float: right;}
 (use-package alert
   :commands (alert)
   :init
-  (setq alert-default-style 'notifier))
+  (setq alert-default-style 'mode-line))
 
 ;; Ledger mode
 (use-package ledger-mode
